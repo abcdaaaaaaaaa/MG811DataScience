@@ -14,7 +14,7 @@ def vals(minval, maxval, count):
 def limit(value, minlim, maxlim):
     return np.minimum(np.maximum(value, minlim), maxlim)
 
-def time(x):
+def time_curve(x):
     if 0 <= x <= 1:
         return 325.79
     elif 1 < x <= 2:
@@ -59,7 +59,7 @@ def calculate_correction(t):
     corr_rh, _ = interpolate_from_table(65, rh_data)
     a_corr = (corr_temp + corr_rh + gases['CO2'][0]) / 3
     b_corr = (-0.0863 + -0.0733 + gases['CO2'][1]) / 3
-    return 3500 / inverseyaxb(a_corr, time(t), b_corr)
+    return 3500 / inverseyaxb(a_corr, time_curve(t), b_corr)
 
 def emf_from_ppm(temp, rh, ppm, gas_name, t):
     a_temp, b_temp = interpolate_from_table(temp, temp_data)
