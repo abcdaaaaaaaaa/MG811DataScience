@@ -13,8 +13,8 @@ getcontext().prec = 200
 def roundf(*args):
     return tuple(round(x, 4) for x in args)
 
-def round2(value):
-    return round(value, 2)
+def round4(value):
+    return round(value, 4)
 
 def yaxb(a, x, b):
     return a * np.power(x, b)
@@ -90,10 +90,10 @@ maxval = np.max(SensorValue_surface)
 
 fig = go.Figure()
 
-print(f"Gas: Theoretical CO2 | R²_Per={r2_percentile_time:.4f} |")
+print(f"Gas: Theoretical CO2 | R²_Per={round4(r2_percentile_time)} |")
 
 with open("EstimationReport.txt", "a") as f:
-    f.write(f"Gas: Theoretical CO2 | R²_Per={r2_percentile_time:.4f} |\n")
+    f.write(f"Gas: Theoretical CO2 | R²_Per={round4(r2_percentile_time)} |\n")
 
 for i, sv in enumerate(SensorValue_surface):
     sensor_value = Decimal(sv)
@@ -103,7 +103,7 @@ for i, sv in enumerate(SensorValue_surface):
 
     current_ppm = round(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
     if (current_ppm != min_co2_ppm and current_ppm != max_co2_ppm): 
-        current_ppm = round(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm), 4)
+        current_ppm = round4(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
 
     if current_ppm >= 1000:
         current_ppm = 1000
@@ -124,7 +124,7 @@ for sv in SensorValue:
 
     current_ppm = round(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
     if (current_ppm != min_co2_ppm and current_ppm != max_co2_ppm): 
-        current_ppm = round(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm), 4)
+        current_ppm = round4(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
 
     if current_ppm >= 1000:
         current_ppm = 1000
@@ -140,7 +140,7 @@ fig.add_trace(go.Scatter(x=SensorValue, y=ppm_values, mode='markers', name = "Re
 fig.add_trace(go.Scatter(x=SensorValue_surface, y=ppm_values_surface, mode='lines', name = "SensorValue's Curve", line=dict(color="#EF553B")), row=1, col=2)
 
 fig.update_layout(
-    title=f"MG811 Theoretical CO₂ Slope Estimation: R² = {r2_percentile_time}",
+    title=f"MG811 Theoretical CO₂ Slope Estimation: R² = {round4(r2_percentile_time)}",
     xaxis=dict(title='X: Time (w)'),
     yaxis=dict(title='Y: SensorValue (z)'),
     xaxis2=dict(title='X: SensorValue'),
