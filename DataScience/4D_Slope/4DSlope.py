@@ -74,10 +74,9 @@ def correction_time(t):
     return t if t < 20 else t % 20.0
 
 def calculate_correction(t):
-    corr_temp, _ = interpolate_from_table(28, temp_data)
-    corr_rh, _ = interpolate_from_table(65, rh_data)
-    a_corr = (corr_temp + corr_rh + gases['CO2'][0]) / 3
-    b_corr = (-0.0863 + -0.0733 + gases['CO2'][1]) / 3
+    temp_corr_a, temp_corr_b = interpolate_from_table(28, temp_data)
+    a_corr = (temp_corr_a + 538.2376 + gases['CO2'][0]) / 3
+    b_corr = (temp_corr_b + -0.0733 + gases['CO2'][1]) / 3
     return 3500 / inverseyaxb(a_corr, time_curve(t), b_corr)
 
 def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
@@ -435,3 +434,4 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
+
