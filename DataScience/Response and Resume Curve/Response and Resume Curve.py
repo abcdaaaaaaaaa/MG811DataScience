@@ -51,7 +51,11 @@ for start, end in intervals:
 fig.add_trace(go.Scatter(x=x_points, y=y_points, mode='markers', marker=dict(color='blue', size=10, symbol='diamond'), showlegend=False, hoverinfo='text', hovertext=[f'x={x:.2f}, y={y:.2f}' for x,y in zip(x_points,y_points)]), row=1, col=1)
 
 t = np.linspace(0, 20, 200)
-correction = 3500 / inverseyaxb(532.25204, time(t), -0.08044)
+temp_corr_a = interpolate(28, 20, 30, 523.094, 527.0596)
+temp_corr_b = interpolate(28, 20, 30, -0.0863, -0.0879)
+a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3
+b_corr = (temp_corr_b + -0.0733 + -0.0722) / 3
+correction = 3500 / inverseyaxb(a_corr, time(t), b_corr)
 fig.add_trace(go.Scatter(x=t, y=correction, mode='lines', line=dict(color='red', width=2), showlegend=False, hoverinfo='x+y'), row=1, col=2)
 
 fig.update_layout(
@@ -63,6 +67,3 @@ fig.update_layout(
 )
 
 fig.write_html("Response and Resume Curve.html")
-
-# (interpolate(28, 20, 30, 523.094, 527.0596) + 538.2376) / 2 --> 532.25204
-# (interpolate(28, 20, 30, -0.0863, -0.0879) - 0.0733) / 2 -->-0.08044
