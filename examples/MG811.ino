@@ -1,4 +1,7 @@
-#include "MG811.h"
+// (1) The library also supports data science applications such as gradient 4D Slope Estimation from Python!:
+// (1) https://github.com/abcdaaaaaaaaa/MQDataScience/blob/main/DataScience/4D_Slope
+
+#include <MG811.h>
 
 // For https://github.com/abcdaaaaaaaaa/MG811DataScience/blob/main/DataScience/4D_Slope/4D_Datas.xlsx the Time column should be defined as 9, 29, 49... 9 + 20k.
 // If you want to define the Time function as 1, 2, 3 as in the standard, you can remove the delays or define it as delay(1000).
@@ -17,7 +20,7 @@ MG811 sensor(ADC_BIT_RESU, pin);
 
 void setup() {
     Serial.begin(115200); // for ESP32
-    sensor.begin();
+    sensor.begin(); // WARNING: To get accurate results, please use the resistance value recommended in the data sheet.
 }
 
 void loop() {
@@ -33,16 +36,19 @@ void loop() {
       delay(9000);
 
       Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
+      TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
       
       CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO2");
       CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CH4");
       C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, "C2H5OH");
       CO = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO");
-      
-      TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
 
+      Serial.println();
       Serial.print("Correction Coefficient: ");
       Serial.println(Correction);
+      Serial.print("TheoreticalCO2: ");
+      Serial.println(TheoreticalCO2);
+      Serial.println();
       
       Serial.print("CO2: ");
       Serial.println(CO2);
@@ -52,11 +58,10 @@ void loop() {
       Serial.println(C2H5OH);
       Serial.print("CO: ");
       Serial.println(CO);
-         
-      Serial.print("TheoreticalCO2: ");
-      Serial.println(TheoreticalCO2);
       
       firstReadDone = true;
+
+      Serial.println("----------");
       delay(20000);
     }
   
@@ -71,16 +76,18 @@ void loop() {
       
       if (firstReadDone) { 
         Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
-        
+        TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
+
         CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO2");
         CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CH4");
         C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, "C2H5OH");
         CO = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO");
-        
-        TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
-  
+          
         Serial.print("Correction Coefficient: ");
         Serial.println(Correction);
+        Serial.print("TheoreticalCO2: ");
+        Serial.println(TheoreticalCO2);
+        Serial.println();
         
         Serial.print("CO2: ");
         Serial.println(CO2);
@@ -90,10 +97,8 @@ void loop() {
         Serial.println(C2H5OH);
         Serial.print("CO: ");
         Serial.println(CO);
-           
-        Serial.print("TheoreticalCO2: ");
-        Serial.println(TheoreticalCO2);
-      
+
+        Serial.println("----------");
         delay(20000);
       }
     }
