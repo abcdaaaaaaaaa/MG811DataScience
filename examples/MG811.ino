@@ -1,0 +1,100 @@
+#include "MG811.h"
+
+// For https://github.com/abcdaaaaaaaaa/MG811DataScience/blob/main/DataScience/4D_Slope/4D_Datas.xlsx the Time column should be defined as 9, 29, 49... 9 + 20k.
+// If you want to define the Time function as 1, 2, 3 as in the standard, you can remove the delays or define it as delay(1000).
+// On the other hand, the range in which the sensor can measure with the highest accuracy is specified in the data sheet as 7-11 seconds in 20-second periods.
+
+#define ADC_BIT_RESU (12) // for ESP32
+#define pin          (35) // D35 (ADC1)
+
+unsigned long startTime = 0;
+bool measuring = false;
+bool firstReadDone = false;
+
+float sensorVal, CO2, CH4, C2H5OH, CO, TheoreticalCO2, temp, rh, Correction;
+
+MG811 sensor(ADC_BIT_RESU, pin);
+
+void setup() {
+    Serial.begin(115200); // for ESP32
+    sensor.begin();
+}
+
+void loop() {
+    temp = 20.0; // DHT22 is recommended °C (Celsius)
+    rh = 33.0;   // DHT22 is recommended %  (Relative Humidity)
+    
+    sensorVal = sensor.read();
+  
+    if (sensorVal > 0 && !measuring) {
+      startTime = millis() / 1000;
+      measuring = true;
+      firstReadDone = false;
+      delay(9000);
+
+      Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
+      
+      CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO2");
+      CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CH4");
+      C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, "C2H5OH");
+      CO = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO");
+      
+      TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
+
+      Serial.print("Correction Coefficient: ");
+      Serial.println(Correction);
+      
+      Serial.print("CO2: ");
+      Serial.println(CO2);
+      Serial.print("CH4: ");
+      Serial.println(CH4);
+      Serial.print("C2H5OH: ");
+      Serial.println(C2H5OH);
+      Serial.print("CO: ");
+      Serial.println(CO);
+         
+      Serial.print("TheoreticalCO2: ");
+      Serial.println(TheoreticalCO2);
+      
+      firstReadDone = true;
+      delay(20000);
+    }
+  
+    while (measuring) {
+      sensorVal = sensor.read();
+      
+      if (sensorVal == 0) {
+        measuring = false;
+        startTime = 0;
+        break;
+      }
+      
+      if (firstReadDone) { 
+        Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
+        
+        CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO2");
+        CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CH4");
+        C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, "C2H5OH");
+        CO = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO");
+        
+        TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
+  
+        Serial.print("Correction Coefficient: ");
+        Serial.println(Correction);
+        
+        Serial.print("CO2: ");
+        Serial.println(CO2);
+        Serial.print("CH4: ");
+        Serial.println(CH4);
+        Serial.print("C2H5OH: ");
+        Serial.println(C2H5OH);
+        Serial.print("CO: ");
+        Serial.println(CO);
+           
+        Serial.print("TheoreticalCO2: ");
+        Serial.println(TheoreticalCO2);
+      
+        delay(20000);
+      }
+    }
+}
