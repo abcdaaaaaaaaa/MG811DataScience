@@ -224,7 +224,7 @@ a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(time
 a_rh_time, b_rh_time, r2_rh_time, r2_temp_time = roundf(a_rh_time, b_rh_time, r2_rh_time, r2_temp_time)
 a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_time, b_percentile_time, r2_percentile_time)
 
-time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time)-min(time))*2, 200)
+time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time)-min(time))*2+min(time), 200)
 temperature_surface = limit(np.array([predict_temp(t, M, C, D, w) for t in time_surface]), -10, 50)
 rh_surface = limit(yaxb(a_rh_time, time_surface, b_rh_time), 0, 100)
 correction_coefficient_surface = np.array([calculate_correction(correction_time(t)) for t in time_surface])
@@ -434,5 +434,6 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
+
 
 
