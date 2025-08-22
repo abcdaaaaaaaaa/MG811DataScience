@@ -98,15 +98,15 @@ def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
     b_avg = (b_temp + b_rh + gas_b * R2) / (2 + R2)
 
     if np.isscalar(t_corr):
-        correction = calculate_correction(t_corr)
+        correction = calculate_correction(correction_time(t_corr))
     else:
-        correction = np.array([calculate_correction(t) for t in t_corr])
+        correction = np.array([calculate_correction(correction_time(t)) for t in t_corr])
 
     EMF = a_avg * ((ppm / correction) ** b_avg)
     return EMF
 
 
-def Sensorppm(temp, rh, EMF, gas_name, t_corr):
+def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
     if np.isscalar(temp):
         a_temp, b_temp = interpolate_from_table(temp, temp_data)
     else:
@@ -123,11 +123,14 @@ def Sensorppm(temp, rh, EMF, gas_name, t_corr):
 
     a_avg = (a_temp + a_rh + gas_a * R2) / (2 + R2)
     b_avg = (b_temp + b_rh + gas_b * R2) / (2 + R2)
-    
-    if np.isscalar(t_corr):
-        correction = calculate_correction(t_corr)
+
+    if (cr_mode):
+        if np.isscalar(t_corr):
+            correction = calculate_correction(correction_time(t_corr))
+        else:
+            correction = np.array([calculate_correction(correction_time(t)) for t in t_corr])
     else:
-        correction = np.array([calculate_correction(t) for t in t_corr])
+        correction = 1.5371654620976198
     
     ppm = inverseyaxb(a_avg, EMF, b_avg) * correction
     return ppm
@@ -189,14 +192,14 @@ temp_data = {
     10: (520.9298, -0.0849),
     20: (523.094, -0.0863),
     30: (527.0596, -0.0879),
-    50: (527.0802, -0.0891),
+    50: (527.0802, -0.0891)
 }
 
 rh_data = {
     20: (540, -0.07),
     40: (536.8846, -0.0726),
     65: (538.2376, -0.0733),
-    85: (529.1227, -0.0717),
+    85: (529.1227, -0.0717)
 }
 
 gases = {
@@ -214,21 +217,22 @@ percentile, temperature, rh = limit(percentile, 0, 100), limit(temperature, -10,
 M, C, D, w = fit_daily_sine(time, temperature)
 SensorValue = percentile / 100
 correction_coefficient = np.array([calculate_correction(correction_time(t)) for t in time])
-
+corrected_time = time if min(time)==1 else (time - min(time)) / 20 + 1
 temp_time = np.array([predict_temp(t, M, C, D, w) for t in time])
 r2_temp_time = calculate_r2(temperature, temp_time)
 
-a_rh_time, b_rh_time, r2_rh_time = fit_time_with_r2(time, rh)
-a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(time, percentile)
+a_rh_time, b_rh_time, r2_rh_time = fit_time_with_r2(corrected_time, rh)
+a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(corrected_time, percentile)
 
 a_rh_time, b_rh_time, r2_rh_time, r2_temp_time = roundf(a_rh_time, b_rh_time, r2_rh_time, r2_temp_time)
 a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_time, b_percentile_time, r2_percentile_time)
 
 time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time)-min(time))*2+min(time), 200)
+corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
 temperature_surface = limit(np.array([predict_temp(t, M, C, D, w) for t in time_surface]), -10, 50)
-rh_surface = limit(yaxb(a_rh_time, time_surface, b_rh_time), 0, 100)
+rh_surface = limit(yaxb(a_rh_time, corrected_time_surface, b_rh_time), 0, 100)
 correction_coefficient_surface = np.array([calculate_correction(correction_time(t)) for t in time_surface])
-percentile_surface = limit(yaxb(a_percentile_time, time_surface, b_percentile_time), 0, 100)
+percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
 
 mintime = np.min(time_surface)
@@ -236,10 +240,12 @@ maxtime = np.max(time_surface)
 
 fig = go.Figure()
 
-ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time)
-fig.add_trace(go.Scatter(x=time, y=ppm/correction_coefficient, mode='markers', marker=dict(color="#636efa"), name=selected_gas))
-ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface)
-fig.add_trace(go.Scatter(x=time_surface, y=ppm_surface/correction_coefficient_surface, mode='lines', marker=dict(color="#636efa"), name=selected_gas))
+ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, True)
+false_ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, False)
+fig.add_trace(go.Scatter(x=time, y=false_ppm, mode='markers', marker=dict(color="#636efa"), name=selected_gas))
+ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, True)
+false_ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, False)
+fig.add_trace(go.Scatter(x=time_surface, y=false_ppm_surface, mode='lines', marker=dict(color="#636efa"), name=selected_gas))
 
 mintemp = np.min(temperature_surface)
 maxtemp = np.max(temperature_surface)
@@ -425,8 +431,8 @@ with open("EstimationReport.txt", "a") as f:
     f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
 
 for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_surface, rh_surface, SensorValue_surface, correction_coefficient_surface):
-    EMF_input = interpolate(sv_val, 0, 1, emf_min, emf_max)
-    ppm_val = Sensorppm(temp_val, rh_val, EMF_input, selected_gas, t_val)
+    EMF_input = interpolate(sv_val, 0, 1, emf_max, emf_min)
+    ppm_val = Sensorppm(temp_val, rh_val, EMF_input, selected_gas, t_val, True)
     EMF_val = emf_from_ppm(temp_val, rh_val, ppm_val, selected_gas, t_val)
     print(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}")
     with open("EstimationReport.txt", "a") as f:
@@ -434,6 +440,3 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
-
-
-
