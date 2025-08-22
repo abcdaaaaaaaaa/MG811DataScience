@@ -73,13 +73,16 @@ max_co2_ppm = Decimal(1000)
 ppm_values = []
 ppm_values_surface = []
 
-a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(time, percentile)
+corrected_time = time if min(time)==1 else (time - min(time)) / 20 + 1
+
+a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(corrected_time, percentile)
 a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_time, b_percentile_time, r2_percentile_time)
 
 SensorValue = percentile / 100
 
-time_surface = vals(min(time), max(time) * 2, 200)
-percentile_surface = limit(yaxb(a_percentile_time, time_surface, b_percentile_time), 0, 100)
+time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time)-min(time))*2+min(time), 200)
+corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
+percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
 
 mintime = np.min(time_surface)
@@ -149,4 +152,3 @@ fig.update_layout(
 )
 
 fig.write_html(f"MG811_Theoretical_CO2_Slope_Estimation.html")
-
