@@ -13,8 +13,8 @@ def exponential_interpolate(value, min_value, max_value, target_min, target_max)
 def inverseyaxb(valuea, value, valueb):
     return np.power(value / valuea, 1 / valueb)
 
-def yaxb(valuea, value, valueb):
-    return valuea * np.power(value, valueb)
+def limit(value, minlim, maxlim):
+    return np.minimum(np.maximum(value, minlim), maxlim)
 
 def time(x):
     if 0 <= x <= 1:
@@ -56,13 +56,11 @@ def interpolate_from_table(x, table):
             b = interpolate(x, keys[i], keys[i + 1], b0, b1)
             return (a, b)
 
-
-
-temp = 55
-RH = 65
-SensorValue = 0.15
-t = 9
-
+temp = limit(float(input("temp: ")), -10, 50)
+RH = limit(float(input("RH: ")), 40, 85)
+SensorValue = limit(float(input("SensorValue: ")), 40, 85)
+t = abs(float(input("second: ")))
+gas_name = input("MG811 gas name (CO2 / C2H5OH / CO / CH4): ")
 
 temp_data = {
     -10: (522.7202, -0.0843),
@@ -70,20 +68,21 @@ temp_data = {
     10: (520.9298, -0.0849),
     20: (523.094, -0.0863),
     30: (527.0596, -0.0879),
-    50: (527.0802, -0.0891),
+    50: (527.0802, -0.0891)
 }
 
 rh_data = {
+    20: (540, -0.07),
     40: (536.8846, -0.0726),
     65: (538.2376, -0.0733),
-    85: (529.1227, -0.0717),
+    85: (529.1227, -0.0717)
 }
 
 gases = {
-    'CH4':     (326.7924, -0.0017, 1, 323.217, 324.2145),
-    'C2H5OH':  (329.7936, -0.0039, 0.9049, 320.6234, 323.616),
-    'CO':      (422.0278, -0.0481, 0.8772, 264.1646, 323.616),
-    'CO2':     (499.0689, -0.0722, 1, 303.6658, 324.2145),
+    'CH4':     (326.7924, -0.0017, 1, 100, 1000, 323.217, 324.2145),
+    'C2H5OH':  (329.7936, -0.0039, 0.9049, 100, 1000, 320.6234, 323.616),
+    'CO':      (422.0278, -0.0481, 0.8772, 100, 10000, 264.1646, 323.616),
+    'CO2':     (499.0689, -0.0722, 1, 400, 1000, 303.6658, 324.2145)
 }
 
 a_temp, b_temp = interpolate_from_table(temp, temp_data)
@@ -94,14 +93,14 @@ temp_corr_a, temp_corr_b = interpolate_from_table(28, temp_data)
 a_corr = (temp_corr_a + 538.2376 + gases['CO2'][0]) / 3
 b_corr = (temp_corr_b + -0.0733 + gases['CO2'][1]) / 3
 
-correction = 3500 / inverseyaxb(a_corr, time(t), b_corr)
-gas_name = 'CO2'
-gas_a, gas_b, R2, min_emf, max_emf = gases[gas_name]
+t_corr = t if t < 20 else t % 20.0
+correction = 3500 / inverseyaxb(a_corr, time(t_corr), b_corr)
+
+gas_a, gas_b, R2, _, _, min_emf, max_emf = gases[gas_name]
 EMF = interpolate(SensorValue, 0, 1, max_emf, min_emf)
 a_avg = (a_temp + a_rh + gas_a * R2) / (2 + R2)
 b_avg = (b_temp + b_rh + gas_b * R2) / (2 + R2)
 
 ppm = inverseyaxb(a_avg, EMF, b_avg) * correction
 
-print(correction)
-print(ppm)
+print(f"MG811 {gas_name} gas " + str(ppm) + "ppm" + " ×" + str(correction))
