@@ -6,4 +6,6 @@
 <img width="1264" height="577" alt="CH4 4D ppm slope" src="https://github.com/user-attachments/assets/fce0c1b1-624f-455a-b4dc-971eec893389" />
 <img width="1264" height="577" alt="C2H5OH 4D ppm slope" src="https://github.com/user-attachments/assets/2c74d158-085e-4a8f-b632-bc17d2fca5d9" />
 <img width="1264" height="577" alt="CO 4D ppm slope" src="https://github.com/user-attachments/assets/f073183d-ef16-4160-823c-d19d915deb39" />
-<img width="1264" height="577" alt="Theoretical CO2 slope estimation" src="https://github.com/user-attachments/assets/39d2d0ae-2280-4a99-bfbf-54687203aaef" />
+<img width="1264" height="577" alt="Theoretical CO2 slope estimation" src="https://github.com/user-attachments/assets/cfaa916c-d602-4bdb-b74a-d9e063a363cf" />
+
+
