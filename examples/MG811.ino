@@ -1,5 +1,5 @@
 // (1) The library also supports data science applications such as gradient 4D Slope Estimation from Python!:
-// (1) https://github.com/abcdaaaaaaaaa/MQDataScience/blob/main/DataScience/4D_Slope
+// (1) https://github.com/abcdaaaaaaaaa/MG811DataScience/blob/main/DataScience/4D_Slope
 
 #include <MG811.h>
 
@@ -20,7 +20,7 @@ MG811 sensor(ADC_BIT_RESU, pin);
 
 void setup() {
     Serial.begin(115200); // for ESP32
-    sensor.begin(); // WARNING: To get accurate results, please use the resistance value recommended in the data sheet.
+    sensor.begin(); // WARNING: To get accurate results, please use the resistance (RL) value recommended in the data sheet.
 }
 
 void loop() {
@@ -103,3 +103,4 @@ void loop() {
       }
     }
 }
+
