@@ -80,7 +80,7 @@ a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_t
 
 SensorValue = percentile / 100
 
-time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time)-min(time))*2+min(time), 200)
+time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time) - min(time)) * 2 + min(time) + 20, 200)
 corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
 percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
@@ -152,3 +152,4 @@ fig.update_layout(
 )
 
 fig.write_html(f"MG811_Theoretical_CO2_Slope_Estimation.html")
+
