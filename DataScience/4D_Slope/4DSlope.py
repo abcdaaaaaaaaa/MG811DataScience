@@ -77,7 +77,7 @@ def calculate_correction(t):
     temp_corr_a, temp_corr_b = interpolate_from_table(28, temp_data)
     a_corr = (temp_corr_a + 538.2376 + gases['CO2'][0]) / 3
     b_corr = (temp_corr_b + -0.0733 + gases['CO2'][1]) / 3
-    return 3500 / inverseyaxb(a_corr, time_curve(t), b_corr)
+    return 3500 / inverseyaxb(a_corr, time_curve(correction_time(t)), b_corr)
 
 def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
     if np.isscalar(temp):
@@ -98,9 +98,9 @@ def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
     b_avg = (b_temp + b_rh + gas_b * R2) / (2 + R2)
 
     if np.isscalar(t_corr):
-        correction = calculate_correction(correction_time(t_corr))
+        correction = calculate_correction(t_corr)
     else:
-        correction = np.array([calculate_correction(correction_time(t)) for t in t_corr])
+        correction = np.array([calculate_correction(t) for t in t_corr])
 
     EMF = a_avg * ((ppm / correction) ** b_avg)
     return EMF
@@ -126,9 +126,9 @@ def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
 
     if (cr_mode):
         if np.isscalar(t_corr):
-            correction = calculate_correction(correction_time(t_corr))
+            correction = calculate_correction(t_corr)
         else:
-            correction = np.array([calculate_correction(correction_time(t)) for t in t_corr])
+            correction = np.array([calculate_correction(t) for t in t_corr])
     else:
         correction = 1.5371654620976198
     
@@ -216,7 +216,7 @@ time, percentile, temperature, rh = np.array(df["Time"], dtype=float), np.array(
 percentile, temperature, rh = limit(percentile, 0, 100), limit(temperature, -10, 50), limit(rh, 0, 100)
 M, C, D, w = fit_daily_sine(time, temperature)
 SensorValue = percentile / 100
-correction_coefficient = np.array([calculate_correction(correction_time(t)) for t in time])
+correction_coefficient = np.array([calculate_correction(t) for t in time])
 corrected_time = time if min(time)==1 else (time - min(time)) / 20 + 1
 temp_time = np.array([predict_temp(t, M, C, D, w) for t in time])
 r2_temp_time = calculate_r2(temperature, temp_time)
@@ -231,7 +231,7 @@ time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time) - min
 corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
 temperature_surface = limit(np.array([predict_temp(t, M, C, D, w) for t in time_surface]), -10, 50)
 rh_surface = limit(yaxb(a_rh_time, corrected_time_surface, b_rh_time), 0, 100)
-correction_coefficient_surface = np.array([calculate_correction(correction_time(t)) for t in time_surface])
+correction_coefficient_surface = np.array([calculate_correction(t) for t in time_surface])
 percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
 
@@ -440,4 +440,3 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
-
