@@ -1,7 +1,7 @@
 # MG811DataScience v5.1.0
 
 ## MG811DataScience What can be create?
-"The first and only Arduino library where MG811 combine with Data Science"
+"The first and only Arduino library where MG811 gas sensor combine with Data Science"
 
 <img width="1264" height="577" alt="Response and Resume Curve" src="https://github.com/user-attachments/assets/4b7115d6-495a-4c59-83e2-4451eb5590d9" />
 <img width="1264" height="577" alt="Theoretical CO2" src="https://github.com/user-attachments/assets/c5b37b61-cee6-42da-b7e5-da913ef14818" />
