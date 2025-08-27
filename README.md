@@ -15,7 +15,7 @@
 <img width="1264" height="577" alt="C2H5OH 4D ppm surface" src="https://github.com/user-attachments/assets/7ed29ac7-9a81-4ae0-9d57-abaf301c25d4" />
 <img width="1264" height="577" alt="CO 4D ppm surface" src="https://github.com/user-attachments/assets/aa13e593-cd1f-4785-aae8-34a5f25e020e" />
 
-## 4) 4D Slope Estimation In 2 Different Modes
+## 4) Slope Estimation in Time-Dependent 4D Space In 2 Different Modes
 ### 1) Multi-Period Mode
 <img width="1264" height="577" alt="CO2 4D ppm slope" src="https://github.com/user-attachments/assets/7fe5aae6-3eeb-49fe-9859-fbe07320fa1b" />
 <img width="1264" height="577" alt="CH4 4D ppm slope" src="https://github.com/user-attachments/assets/c7ffbd0b-d7d0-4227-9b49-9c9ac99e1a14" />
