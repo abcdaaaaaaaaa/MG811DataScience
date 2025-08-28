@@ -11,8 +11,7 @@
 
 ###
 
-<img width="1264" height="725" alt="nerst" src="https://github.com/user-attachments/assets/8b077e1d-379c-428f-bb3d-d8c4d26390eb" />
-
+<img width="1264" height="936" alt="nerst" src="https://github.com/user-attachments/assets/e8ecfe3d-8bec-4356-9921-039688b8d2f6" />
 
 ## 3) 4D Surface Diagram for MG811 Gases
 <img width="1264" height="577" alt="CO2 4D ppm surface" src="https://github.com/user-attachments/assets/cee56fe4-78dd-46e5-a097-5ccaa0deaa26" />
