@@ -119,7 +119,6 @@ float MG811::calculateppm(float SensorValue, float temp, float rh, float correct
     return inverseYaxb(a_avg, emf, b_avg) * correction;
 }
 
-
 float MG811::TheoreticalCO2(float x) {
   float polynomial = 5.0000 * pow(x, 1) + 6.5833 * pow(x, 2) - 4.9167 * pow(x, 3); // RMSE: 0.8484
   return 1000.0 - 600.0 * exp(-polynomial);
