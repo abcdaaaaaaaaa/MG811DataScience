@@ -38,3 +38,11 @@
 
 ## 4D Axis Features:
 <img width="750" alt="4dformullas" src="https://github.com/user-attachments/assets/7c5a1464-fcb9-4a8f-9693-c2c473f1ec1a" />
+
+## Ppm Formullas
+
+<img width="1264" height="757" alt="ppm1" src="https://github.com/user-attachments/assets/b5c17ad7-2ee6-44a4-b71a-f6689fdaf9a2" />
+<img width="1264" height="511" alt="ppm2" src="https://github.com/user-attachments/assets/b5109fc7-97fe-4aab-879d-26e3ef62c98e" />
+<img width="1264" height="676" alt="ppm3" src="https://github.com/user-attachments/assets/87acce1b-ab91-4c04-a5da-b11fdcb313dd" />
+<img width="1264" height="738" alt="ppm4" src="https://github.com/user-attachments/assets/3af8d549-2d08-4757-8254-eb57059afd7b" />
+
