@@ -9,6 +9,11 @@
 ## 2) Calculating Theoretical CO2 using the Nernst Equation and Converting It Into a Polynomial Function
 <img width="1264" height="577" alt="Theoretical CO2" src="https://github.com/user-attachments/assets/c5b37b61-cee6-42da-b7e5-da913ef14818" />
 
+###
+
+<img width="1264" height="725" alt="nerst" src="https://github.com/user-attachments/assets/8b077e1d-379c-428f-bb3d-d8c4d26390eb" />
+
+
 ## 3) 4D Surface Diagram for MG811 Gases
 <img width="1264" height="577" alt="CO2 4D ppm surface" src="https://github.com/user-attachments/assets/cee56fe4-78dd-46e5-a097-5ccaa0deaa26" />
 <img width="1264" height="577" alt="CH4 4D ppm surface" src="https://github.com/user-attachments/assets/2de201f0-2ef2-4a3d-ae0d-f090a177906a" />
@@ -27,6 +32,10 @@
 <img width="1264" height="577" alt="CH4 4D ppm slope-2" src="https://github.com/user-attachments/assets/15fb11dd-b683-4ba1-8a97-691ba6f8b737" />
 <img width="1264" height="577" alt="C2H5OH 4D ppm slope-2" src="https://github.com/user-attachments/assets/eaa2ae1f-13a2-41fe-ac63-3bbabcb53866" />
 <img width="1264" height="577" alt="CO 4D ppm slope-2" src="https://github.com/user-attachments/assets/e502eca7-b96b-4027-a6ee-2ab7d05decb1" />
+
+## 4D Axis Features:
+<img width="750" alt="4dformullas" src="https://github.com/user-attachments/assets/7c5a1464-fcb9-4a8f-9693-c2c473f1ec1a" />
+
 
 ## 5) Visualization of the Slope Estimations of Theoretical CO2
 <img width="1264" height="577" alt="Theoretical CO2 slope estimation" src="https://github.com/user-attachments/assets/fac27fee-e212-457e-af57-7ad697099709" />
