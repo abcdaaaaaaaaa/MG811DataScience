@@ -1,7 +1,7 @@
 # MG811DataScience v5.1.0
 
 ## MG811DataScience What can be create?
-"The first and only Arduino library where MG811 gas sensor combine with Data Science"
+"The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
 
 ## 1) Calculation of Response and Resume Curve Depending on the Time of the Correction Coefficient
 <img width="1264" height="577" alt="Response and Resume Curve" src="https://github.com/user-attachments/assets/4b7115d6-495a-4c59-83e2-4451eb5590d9" />
