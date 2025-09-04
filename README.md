@@ -1,18 +1,18 @@
 # MG811DataScience v5.1.0
 
-## MG811DataScience What can be create?
-"The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
-
 ## What's await 🎁 v5.1.5?
 ### Specifying the y = ax^b formula for each ppm range, thus increasing the R^2 value:
 ### For Example Like CO 
 <img width="1264" height="577" alt="MG811 CO curves" src="https://github.com/user-attachments/assets/da4ab4ea-e3d1-4c64-93d3-f6efd0a85bfc" />
 
-## 1) Calculation of Response and Resume Curve Depending on the Time of the Correction Coefficient
-<img width="1264" height="577" alt="Response and Resume Curve" src="https://github.com/user-attachments/assets/4b7115d6-495a-4c59-83e2-4451eb5590d9" />
+## MG811DataScience What can be create?
+"The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
 
-## 2) Advanced Data Science System for Regression Calculations
+## 1) Advanced Data Science System for Regression Calculations
 <img width="1264" height="577" alt="MG811 gas curves" src="https://github.com/user-attachments/assets/d70bad02-2a6e-4747-bafb-70219c593da1" />
+
+## 2) Calculation of Response and Resume Curve Depending on the Time of the Correction Coefficient
+<img width="1264" height="577" alt="Response and Resume Curve" src="https://github.com/user-attachments/assets/4b7115d6-495a-4c59-83e2-4451eb5590d9" />
 
 ## 3) Calculating Theoretical CO2 using the Nernst Equation and Converting It Into a Polynomial Function
 <img width="1264" height="577" alt="Theoretical CO2" src="https://github.com/user-attachments/assets/c5b37b61-cee6-42da-b7e5-da913ef14818" />
