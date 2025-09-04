@@ -6,17 +6,20 @@
 ## 1) Calculation of Response and Resume Curve Depending on the Time of the Correction Coefficient
 <img width="1264" height="577" alt="Response and Resume Curve" src="https://github.com/user-attachments/assets/4b7115d6-495a-4c59-83e2-4451eb5590d9" />
 
-## 2) Calculating Theoretical CO2 using the Nernst Equation and Converting It Into a Polynomial Function
+## 2) Advanced Data Science System for Regression Calculations
+<img width="1264" height="577" alt="MG811 gas curves" src="https://github.com/user-attachments/assets/d70bad02-2a6e-4747-bafb-70219c593da1" />
+
+## 3) Calculating Theoretical CO2 using the Nernst Equation and Converting It Into a Polynomial Function
 <img width="1264" height="577" alt="Theoretical CO2" src="https://github.com/user-attachments/assets/c5b37b61-cee6-42da-b7e5-da913ef14818" />
 
 ###
 
 <img width="1264" height="936" alt="nerst" src="https://github.com/user-attachments/assets/e8ecfe3d-8bec-4356-9921-039688b8d2f6" />
 
-## 3) Visualization of the Slope Estimations of Theoretical CO2
+## 4) Visualization of the Slope Estimations of Theoretical CO2
 <img width="1264" height="577" alt="Theoretical CO2 slope estimation" src="https://github.com/user-attachments/assets/fac27fee-e212-457e-af57-7ad697099709" />
 
-## 4) Slope Estimation in Time-Dependent 4D Space In 2 Different Modes
+## 5) Slope Estimation in Time-Dependent 4D Space In 2 Different Modes
 ### 1) Multi-Period Mode
 <img width="1264" height="577" alt="CO2 4D ppm slope" src="https://github.com/user-attachments/assets/7fe5aae6-3eeb-49fe-9859-fbe07320fa1b" />
 <img width="1264" height="577" alt="CH4 4D ppm slope" src="https://github.com/user-attachments/assets/c7ffbd0b-d7d0-4227-9b49-9c9ac99e1a14" />
@@ -32,7 +35,7 @@
 ## 4D Axis Features:
 <img width="750" alt="4dformullas" src="https://github.com/user-attachments/assets/7c5a1464-fcb9-4a8f-9693-c2c473f1ec1a" />
 
-## 5) 4D Surface Diagram for MG811 Gases
+## 6) 4D Surface Diagram for MG811 Gases
 <img width="1264" height="577" alt="CO2 4D ppm surface" src="https://github.com/user-attachments/assets/cee56fe4-78dd-46e5-a097-5ccaa0deaa26" />
 <img width="1264" height="577" alt="CH4 4D ppm surface" src="https://github.com/user-attachments/assets/2de201f0-2ef2-4a3d-ae0d-f090a177906a" />
 <img width="1264" height="577" alt="C2H5OH 4D ppm surface" src="https://github.com/user-attachments/assets/7ed29ac7-9a81-4ae0-9d57-abaf301c25d4" />
