@@ -1,5 +1,10 @@
 # MG811DataScience v5.1.0
 
+## What's await v5.1.5?
+### Specifying the y = ax^b formula for each ppm range, thus increasing the R^2 value:
+### For Example Like CO 
+<img width="1264" height="577" alt="MG811 CO curves" src="https://github.com/user-attachments/assets/da4ab4ea-e3d1-4c64-93d3-f6efd0a85bfc" />
+
 ## MG811DataScience What can be create?
 "The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
 
