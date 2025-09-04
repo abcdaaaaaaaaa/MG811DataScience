@@ -8,7 +8,7 @@ public:
     void begin();
     float read();
     float calculateCorrection(unsigned long t);
-    float calculateppm(float SensorValue, float temp, float rh, float correction, String gas);
+    float calculateppm(float SensorValue, float temp, float rh, float correction, int idx);
     float TheoreticalCO2(float x);
     
 private:
@@ -21,3 +21,4 @@ private:
 };
                     
 #endif
+
