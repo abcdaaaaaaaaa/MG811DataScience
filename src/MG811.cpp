@@ -64,13 +64,7 @@ float MG811::calculateCorrection(unsigned long t) {
     return 3500.0 / inverseYaxb(a_corr, curve, b_corr);
 }
 
-float MG811::calculateppm(float SensorValue, float temp, float rh, float correction, String gas) {
-    int idx = 0;
-    if (gas == "CH4") idx = 0;
-    else if (gas == "C2H5OH") idx = 1;
-    else if (gas == "CO") idx = 2;
-    else if (gas == "CO2") idx = 3;
-
+float MG811::calculateppm(float SensorValue, float temp, float rh, float correction, int idx) {
     GasData g = gases[idx];
     float emf = fmap(SensorValue, 0, 1, g.emf_max, g.emf_min);
     
@@ -123,3 +117,4 @@ float MG811::TheoreticalCO2(float x) {
   float polynomial = 5.0000 * pow(x, 1) + 6.5833 * pow(x, 2) - 4.9167 * pow(x, 3); // RMSE: 0.8484
   return 1000.0 - 600.0 * exp(-polynomial);
 }
+
