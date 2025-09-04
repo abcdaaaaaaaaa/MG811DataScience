@@ -38,11 +38,11 @@ void loop() {
       Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
       TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
       
-      CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO2");
-      CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CH4");
-      C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, "C2H5OH");
-      CO = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO");
-
+      CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, 0);
+      C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, 1);
+      CO = sensor.calculateppm(sensorVal, temp, rh, Correction, 2);
+      CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, 3);
+        
       Serial.println();
       Serial.print("Correction Coefficient: ");
       Serial.println(Correction);
@@ -78,10 +78,10 @@ void loop() {
         Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
         TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
 
-        CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO2");
-        CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, "CH4");
-        C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, "C2H5OH");
-        CO = sensor.calculateppm(sensorVal, temp, rh, Correction, "CO");
+        CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, 0);
+        C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, 1);
+        CO = sensor.calculateppm(sensorVal, temp, rh, Correction, 2);
+        CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, 3);
           
         Serial.print("Correction Coefficient: ");
         Serial.println(Correction);
@@ -103,3 +103,4 @@ void loop() {
       }
     }
 }
+
