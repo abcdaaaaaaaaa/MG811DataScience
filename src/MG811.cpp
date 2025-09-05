@@ -10,7 +10,7 @@ MG811::MG811(int bitadc, byte pin)
 struct GasData { float minppm, maxppm, emf_min, emf_max; };
 
 GasData gases[] = {
-    {100, 1000, 323.217, 324.2145}, // CH4
+    {100, 600, 323.217, 324.2145}, // CH4
     {100, 1000, 320.6234, 323.616}, // C2H5OH
     {100, 10000, 264.1646, 323.616}, // CO
     {400, 1000, 303.6658, 324.2145}  // CO2
@@ -142,3 +142,4 @@ float MG811::TheoreticalCO2(float x) {
   float polynomial = 5.0000 * pow(x, 1) + 6.5833 * pow(x, 2) - 4.9167 * pow(x, 3); // RMSE: 0.8484
   return 1000.0 - 600.0 * exp(-polynomial);
 }
+
