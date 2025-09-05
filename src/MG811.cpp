@@ -7,13 +7,13 @@ MG811::MG811(int bitadc, byte pin)
     _pin = pin;
 }
 
-struct GasData { float a, b, R2, minppm, maxppm, emf_min, emf_max; };
+struct GasData { float minppm, maxppm, emf_min, emf_max; };
 
 GasData gases[] = {
-    {326.7924, -0.0017, 1.0,    100, 1000, 323.217, 324.2145}, // CH4
-    {329.7936, -0.0039, 0.9049, 100, 1000, 320.6234, 323.616}, // C2H5OH
-    {422.0278, -0.0481, 0.8772, 100, 10000, 264.1646, 323.616}, // CO
-    {499.0689, -0.0722, 1.0,    400, 1000, 303.6658, 324.2145}  // CO2
+    {100, 1000, 323.217, 324.2145}, // CH4
+    {100, 1000, 320.6234, 323.616}, // C2H5OH
+    {100, 10000, 264.1646, 323.616}, // CO
+    {400, 1000, 303.6658, 324.2145}  // CO2
 };
 
 void MG811::begin() {
@@ -67,6 +67,31 @@ float MG811::calculateCorrection(unsigned long t) {
 float MG811::calculateppm(float SensorValue, float temp, float rh, float correction, int idx) {
     GasData g = gases[idx];
     float emf = fmap(SensorValue, 0, 1, g.emf_max, g.emf_min);
+    float a_gas, b_gas;
+    
+    switch (idx) {
+        case 0: // CH4
+            a_gas = 326.7924; b_gas = -0.0017;
+            break;
+    
+        case 1: // C2H5OH
+            if (emf <= 323.616 && emf > 322.2195) { a_gas = 327.3446; b_gas = -0.0024; }
+            else if (emf <= 322.2195 && emf > 321.0224) { a_gas = 350.0226; b_gas = -0.0129; }
+            else if (emf <= 321.0224 && emf >= 320.6234) { a_gas = 333.2081; b_gas = -0.0056; }
+            break;
+    
+        case 2: // CO
+            if (emf <= 323.616 && emf > 320.0249) { a_gas = 332.606; b_gas = -0.0061; }
+            else if (emf <= 320.0249 && emf > 315.4364) { a_gas = 383.6791; b_gas = -0.0284; }
+            else if (emf <= 315.4364 && emf > 298.0798) { a_gas = 827.293; b_gas = -0.1396; }
+            else if (emf <= 298.0798 && emf > 280.5237) { a_gas = 468.501; b_gas = -0.0618; }
+            else if (emf <= 280.5237 && emf >= 264.1646) { a_gas = 483.2887; b_gas = -0.0654; }
+            break;
+    
+        case 3: // CO2
+            a_gas = 499.0689; b_gas = -0.0722;
+            break;
+    }
     
     float a_temp, b_temp;
     
@@ -107,8 +132,8 @@ float MG811::calculateppm(float SensorValue, float temp, float rh, float correct
         b_rh = -0.0717;
     }
 
-    float a_avg = (a_temp + a_rh + g.a * g.R2) / (2 + g.R2);
-    float b_avg = (b_temp + b_rh + g.b * g.R2) / (2 + g.R2);
+    float a_avg = (a_temp + a_rh + a_gas) / 3;
+    float b_avg = (b_temp + b_rh + b_gas) / 3;
 
     return inverseYaxb(a_avg, emf, b_avg) * correction;
 }
@@ -117,4 +142,3 @@ float MG811::TheoreticalCO2(float x) {
   float polynomial = 5.0000 * pow(x, 1) + 6.5833 * pow(x, 2) - 4.9167 * pow(x, 3); // RMSE: 0.8484
   return 1000.0 - 600.0 * exp(-polynomial);
 }
-
