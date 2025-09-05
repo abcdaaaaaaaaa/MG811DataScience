@@ -4,7 +4,7 @@
 "The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
 
 ## 1) Advanced Data Science System for Regression Calculations
-<img width="1264" height="577" alt=""MG811 gas curves" src="https://github.com/user-attachments/assets/92e7899e-b53b-46e0-8c6b-1ac01a152e7b" />
+<img width="1264" height="577" alt="MG811 gas curves" src="https://github.com/user-attachments/assets/92e7899e-b53b-46e0-8c6b-1ac01a152e7b" />
 
 ## 2) Calculation of Response and Resume Curve Depending on the Time of the Correction Coefficient
 <img width="1264" height="577" alt="Response and Resume Curve" src="https://github.com/user-attachments/assets/4b7115d6-495a-4c59-83e2-4451eb5590d9" />
