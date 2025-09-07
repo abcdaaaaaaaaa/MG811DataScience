@@ -144,7 +144,6 @@ def get_constants_from_ppm(name, ppm):
 
     return a, b
 
-
 def correction_time(t):
     return t if t < 20 else t % 20.0
 
@@ -515,3 +514,4 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
+
