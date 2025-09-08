@@ -179,7 +179,6 @@ def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
     EMF = yaxb(a_avg, (ppm / correction), b_avg)
     return EMF
 
-
 def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
     if np.isscalar(temp):
         a_temp, b_temp = interpolate_from_table(temp, temp_data)
@@ -514,4 +513,5 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
+
 
