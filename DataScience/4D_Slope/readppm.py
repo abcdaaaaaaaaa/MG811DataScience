@@ -1,6 +1,9 @@
 import numpy as np
+import plotly.graph_objects as go
 from scipy.optimize import curve_fit
+import plotly.colors as pc
 import pandas as pd
+import sys
 
 df = pd.read_excel("4D_Datas.xlsx")
 
@@ -40,6 +43,32 @@ def vals(minval, maxval, count):
 
 def limit(value, minlim, maxlim):
     return np.minimum(np.maximum(value, minlim), maxlim)
+
+def time_curve(x):
+    if 0 <= x <= 1:
+        return 325.79
+    elif 1 < x <= 2:
+        return interpolate(x, 1, 2, 325.79, 326.15)
+    elif 2 < x <= 3:
+        return interpolate(x, 2, 3, 326.15, 325.05)
+    elif 3 < x <= 5:
+        return interpolate(x, 3, 5, 325.05, 288.06)
+    elif 5 < x <= 7:
+        return 285.86 + (3.2 * (x - 4) ** -1.0587 - 1)
+    elif 7 < x <= 11:
+        return 285.86
+    elif 11 < x <= 13:
+        return 285.86 + (3.2 * (14 - x) ** -1.0587 - 1)
+    elif 13 < x <= 15:
+        return interpolate(x, 13, 15, 288.06, 319.93)
+    elif 15 < x <= 17:
+        return 324.87 - (5.94 * (x - 14) ** -1.6218 - 1)
+    elif 17 < x <= 19:
+        return 324.87
+    elif 19 < x <= 20:
+        return interpolate(x, 19, 20, 324.87, 325.79)
+    else:
+        return np.nan
 
 def get_constants_from_emf(name, emf):
     a = np.full_like(emf, None, dtype=float)
@@ -115,32 +144,7 @@ def get_constants_from_ppm(name, ppm):
 
     return a, b
 
-def time_curve(x):
-    if 0 <= x <= 1:
-        return 325.79
-    elif 1 < x <= 2:
-        return interpolate(x, 1, 2, 325.79, 326.15)
-    elif 2 < x <= 3:
-        return interpolate(x, 2, 3, 326.15, 325.05)
-    elif 3 < x <= 5:
-        return interpolate(x, 3, 5, 325.05, 288.06)
-    elif 5 < x <= 7:
-        return 285.86 + (3.2 * (x - 4) ** -1.0587 - 1)
-    elif 7 < x <= 11:
-        return 285.86
-    elif 11 < x <= 13:
-        return 285.86 + (3.2 * (14 - x) ** -1.0587 - 1)
-    elif 13 < x <= 15:
-        return interpolate(x, 13, 15, 288.06, 319.93)
-    elif 15 < x <= 17:
-        return 324.87 - (5.94 * (x - 14) ** -1.6218 - 1)
-    elif 17 < x <= 19:
-        return 324.87
-    elif 19 < x <= 20:
-        return interpolate(x, 19, 20, 324.87, 325.79)
-    else:
-        return np.nan
-    
+
 def correction_time(t):
     return t if t < 20 else t % 20.0
 
@@ -259,7 +263,7 @@ time, percentile, temperature, rh = np.array(df["Time"], dtype=float), np.array(
 percentile, temperature, rh = limit(percentile, 0, 100), limit(temperature, -10, 50), limit(rh, 0, 100)
 M, C, D, w = fit_daily_sine(time, temperature)
 SensorValue = percentile / 100
-correction_coefficient = np.array([calculate_correction(correction_time(t)) for t in time])
+correction_coefficient = np.array([calculate_correction(t) for t in time])
 corrected_time = time if min(time)==1 else (time - min(time)) / 20 + 1
 temp_time = np.array([predict_temp(t, M, C, D, w) for t in time])
 r2_temp_time = calculate_r2(temperature, temp_time)
@@ -270,18 +274,18 @@ a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(corr
 a_rh_time, b_rh_time, r2_rh_time, r2_temp_time = roundf(a_rh_time, b_rh_time, r2_rh_time, r2_temp_time)
 a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_time, b_percentile_time, r2_percentile_time)
 
-time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time)-min(time))*2+min(time), 200)
+time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time) - min(time)) * 2 + min(time) + 20, 200)
 corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
 temperature_surface = limit(np.array([predict_temp(t, M, C, D, w) for t in time_surface]), -10, 50)
 rh_surface = limit(yaxb(a_rh_time, corrected_time_surface, b_rh_time), 0, 100)
-correction_coefficient_surface = np.array([calculate_correction(correction_time(t)) for t in time_surface])
+correction_coefficient_surface = np.array([calculate_correction(t) for t in time_surface])
 percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
 
 ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, True)
-false_ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, False)
+# false_ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, False)
 ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, True)
-false_ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, False)
+# false_ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, False)
 
 print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}")
 
