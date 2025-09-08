@@ -12,8 +12,8 @@ def roundf(*args):
 def round2(value):
     return round(value, 2)
 
-def yaxb(a, x, b):
-    return a * np.power(x, b)
+def yaxb(valuea, value, valueb):
+    return valuea * np.power(value, valueb)
 
 def inverseyaxb(valuea, value, valueb):
     return np.power(value / valuea, 1 / valueb)
@@ -40,6 +40,80 @@ def vals(minval, maxval, count):
 
 def limit(value, minlim, maxlim):
     return np.minimum(np.maximum(value, minlim), maxlim)
+
+def get_constants_from_emf(name, emf):
+    a = np.full_like(emf, None, dtype=float)
+    b = np.full_like(emf, None, dtype=float)
+
+    match name:
+        case 'CH4':
+            a = 326.7924
+            b = -0.0017
+
+        case 'C2H5OH':
+            cond1 = (emf <= 323.616) & (emf > 322.2195)
+            cond2 = (emf <= 322.2195) & (emf > 321.0224)
+            cond3 = (emf <= 321.0224) & (emf >= 320.6234)
+
+            a[cond1], b[cond1] = 327.3446, -0.0024
+            a[cond2], b[cond2] = 350.0226, -0.0129
+            a[cond3], b[cond3] = 333.2081, -0.0056
+
+        case 'CO':
+            cond1 = (emf <= 323.616) & (emf > 320.0249)
+            cond2 = (emf <= 320.0249) & (emf > 315.4364)
+            cond3 = (emf <= 315.4364) & (emf > 298.0798)
+            cond4 = (emf <= 298.0798) & (emf > 280.5237)
+            cond5 = (emf <= 280.5237) & (emf >= 264.1646)
+
+            a[cond1], b[cond1] = 332.606, -0.0061
+            a[cond2], b[cond2] = 383.6791, -0.0284
+            a[cond3], b[cond3] = 827.293, -0.1396
+            a[cond4], b[cond4] = 468.501, -0.0618
+            a[cond5], b[cond5] = 483.2887, -0.0654
+
+        case 'CO2':
+            a = 499.0689
+            b = -0.0722
+
+    return a, b
+
+def get_constants_from_ppm(name, ppm):
+    a = np.full_like(ppm, None, dtype=float)
+    b = np.full_like(ppm, None, dtype=float)
+
+    match name:
+        case 'CH4':
+            a = 326.7924
+            b = -0.0017
+
+        case 'C2H5OH':
+            cond1 = (ppm < 600)
+            cond2 = (ppm >= 600) & (ppm < 800)
+            cond3 = (ppm >= 800)
+
+            a[cond1], b[cond1] = 327.3446, -0.0024
+            a[cond2], b[cond2] = 350.0226, -0.0129
+            a[cond3], b[cond3] = 333.2081, -0.0056
+
+        case 'CO':
+            cond1 = (ppm < 600)
+            cond2 = (ppm >= 600) & (ppm < 1000)
+            cond3 = (ppm >= 1000) & (ppm < 1500)
+            cond4 = (ppm >= 1500) & (ppm < 4000)
+            cond5 = (ppm >= 4000)
+
+            a[cond1], b[cond1] = 332.606, -0.0061
+            a[cond2], b[cond2] = 383.6791, -0.0284
+            a[cond3], b[cond3] = 827.293, -0.1396
+            a[cond4], b[cond4] = 468.501, -0.0618
+            a[cond5], b[cond5] = 483.2887, -0.0654
+
+        case 'CO2':
+            a = 499.0689
+            b = -0.0722
+
+    return a, b
 
 def time_curve(x):
     if 0 <= x <= 1:
@@ -72,9 +146,9 @@ def correction_time(t):
 
 def calculate_correction(t):
     temp_corr_a, temp_corr_b = interpolate_from_table(28, temp_data)
-    a_corr = (temp_corr_a + 538.2376 + gases['CO2'][0]) / 3
-    b_corr = (temp_corr_b + -0.0733 + gases['CO2'][1]) / 3
-    return 3500 / inverseyaxb(a_corr, time_curve(t), b_corr)
+    a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3 # 499.0689: CO2_a
+    b_corr = (temp_corr_b + -0.0733 + -0.0722) / 3 # -0.0722: CO2_b
+    return 3500 / inverseyaxb(a_corr, time_curve(correction_time(t)), b_corr)
 
 def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
     if np.isscalar(temp):
@@ -89,19 +163,18 @@ def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
         rh_interp = np.array([interpolate_from_table(r, rh_data) for r in rh])
         a_rh, b_rh = rh_interp[:, 0], rh_interp[:, 1]
 
-    gas_a, gas_b, R2, *_ = gases[gas_name]
-
-    a_avg = (a_temp + a_rh + gas_a * R2) / (2 + R2)
-    b_avg = (b_temp + b_rh + gas_b * R2) / (2 + R2)
-
     if np.isscalar(t_corr):
-        correction = calculate_correction(correction_time(t_corr))
+        correction = calculate_correction(t_corr)
     else:
-        correction = np.array([calculate_correction(correction_time(t)) for t in t_corr])
+        correction = np.array([calculate_correction(t) for t in t_corr])
 
-    EMF = a_avg * ((ppm / correction) ** b_avg)
+    gas_a, gas_b = get_constants_from_ppm(gas_name, ppm / correction)
+
+    a_avg = (a_temp + a_rh + gas_a) / 3
+    b_avg = (b_temp + b_rh + gas_b) / 3
+
+    EMF = yaxb(a_avg, (ppm / correction), b_avg)
     return EMF
-
 
 def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
     if np.isscalar(temp):
@@ -116,16 +189,16 @@ def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
         rh_interp = np.array([interpolate_from_table(r, rh_data) for r in rh])
         a_rh, b_rh = rh_interp[:, 0], rh_interp[:, 1]
 
-    gas_a, gas_b, R2, *_ = gases[gas_name]
+    gas_a, gas_b = get_constants_from_emf(gas_name, EMF)
 
-    a_avg = (a_temp + a_rh + gas_a * R2) / (2 + R2)
-    b_avg = (b_temp + b_rh + gas_b * R2) / (2 + R2)
+    a_avg = (a_temp + a_rh + gas_a) / 3
+    b_avg = (b_temp + b_rh + gas_b) / 3
 
     if (cr_mode):
         if np.isscalar(t_corr):
-            correction = calculate_correction(correction_time(t_corr))
+            correction = calculate_correction(t_corr)
         else:
-            correction = np.array([calculate_correction(correction_time(t)) for t in t_corr])
+            correction = np.array([calculate_correction(t) for t in t_corr])
     else:
         correction = 1.5371654620976198
     
@@ -173,14 +246,14 @@ rh_data = {
 }
 
 gases = {
-    'CH4':     (326.7924, -0.0017, 1, 100, 1000, 323.217, 324.2145),
-    'C2H5OH':  (329.7936, -0.0039, 0.9049, 100, 1000, 320.6234, 323.616),
-    'CO':      (422.0278, -0.0481, 0.8772, 100, 10000, 264.1646, 323.616),
-    'CO2':     (499.0689, -0.0722, 1, 400, 1000, 303.6658, 324.2145)
+    'CH4':     (100, 600, 323.217, 324.2145),
+    'C2H5OH':  (100, 1000, 320.6234, 323.616),
+    'CO':      (100, 10000, 264.1646, 323.616),
+    'CO2':     (400, 1000, 303.6658, 324.2145)
 }
 
-emf_min = gases[selected_gas][5]
-emf_max = gases[selected_gas][6]
+emf_min = gases[selected_gas][2]
+emf_max = gases[selected_gas][3]
 
 time, percentile, temperature, rh = np.array(df["Time"], dtype=float), np.array(df["Per"], dtype=float), np.array(df["Temp"], dtype=float), np.array(df["Rh"], dtype=float)
 percentile, temperature, rh = limit(percentile, 0, 100), limit(temperature, -10, 50), limit(rh, 0, 100)
