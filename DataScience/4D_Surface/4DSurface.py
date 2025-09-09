@@ -57,7 +57,7 @@ def interpolate_from_table(x, table):
             b = interpolate(x, keys[i], keys[i + 1], b0, b1)
             return (a, b)
 
-def get_constants_from_emf(name, emf):
+def get_constants(name, emf):
     a = np.full_like(emf, None, dtype=float)
     b = np.full_like(emf, None, dtype=float)
 
@@ -93,44 +93,6 @@ def get_constants_from_emf(name, emf):
             b = -0.0722
 
     return a, b
-
-def get_constants_from_ppm(name, ppm):
-    a = np.full_like(ppm, None, dtype=float)
-    b = np.full_like(ppm, None, dtype=float)
-
-    match name:
-        case 'CH4':
-            a = 326.7924
-            b = -0.0017
-
-        case 'C2H5OH':
-            cond1 = (ppm < 600)
-            cond2 = (ppm >= 600) & (ppm < 800)
-            cond3 = (ppm >= 800)
-
-            a[cond1], b[cond1] = 327.3446, -0.0024
-            a[cond2], b[cond2] = 350.0226, -0.0129
-            a[cond3], b[cond3] = 333.2081, -0.0056
-
-        case 'CO':
-            cond1 = (ppm < 600)
-            cond2 = (ppm >= 600) & (ppm < 1000)
-            cond3 = (ppm >= 1000) & (ppm < 1500)
-            cond4 = (ppm >= 1500) & (ppm < 4000)
-            cond5 = (ppm >= 4000)
-
-            a[cond1], b[cond1] = 332.606, -0.0061
-            a[cond2], b[cond2] = 383.6791, -0.0284
-            a[cond3], b[cond3] = 827.293, -0.1396
-            a[cond4], b[cond4] = 468.501, -0.0618
-            a[cond5], b[cond5] = 483.2887, -0.0654
-
-        case 'CO2':
-            a = 499.0689
-            b = -0.0722
-
-    return a, b
-
 def calculate_correction(t):
     temp_corr_a, temp_corr_b = interpolate_from_table(28, temp_data)
     a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3 # 499.0689: CO2_a
@@ -139,23 +101,10 @@ def calculate_correction(t):
     t_corr = t if t < 20 else t % 20.0
     return 3500 / inverseyaxb(a_corr, time_curve(t_corr), b_corr)
 
-def emf_from_ppm(temp, rh, ppm, gas_name, t):
-    a_temp, b_temp = interpolate_from_table(temp, temp_data)
-    a_rh, b_rh = interpolate_from_table(rh, rh_data)
-    correction = calculate_correction(t)
-    
-    gas_a, gas_b = get_constants_from_ppm(gas_name, ppm / correction)
-    
-    a_avg = (a_temp + a_rh + gas_a) / 3
-    b_avg = (b_temp + b_rh + gas_b) / 3
-    
-    EMF = yaxb(a_avg, (ppm / correction), b_avg)
-    return EMF
-
 def Sensorppm(temp, rh, EMF, gas_name, t):
     a_temp, b_temp = interpolate_from_table(temp, temp_data)
     a_rh, b_rh = interpolate_from_table(rh, rh_data)
-    gas_a, gas_b = get_constants_from_emf(gas_name, EMF)
+    gas_a, gas_b = get_constants(gas_name, EMF)
     a_avg = (a_temp + a_rh + gas_a) / 3
     b_avg = (b_temp + b_rh + gas_b) / 3
     correction = calculate_correction(t)
@@ -199,15 +148,12 @@ t_slider_values = vals(0, 20, 101)
 for gas_name in gases:
     fig = go.Figure()
     all_surfaces = []
+    
+    emf_min = gases[gas_name][2]
+    emf_max = gases[gas_name][3]
 
     for t in t_slider_values:
-        EMF_low = limit(emf_from_ppm(temp_min, rh_min, gases[gas_name][0], gas_name, t), gases[gas_name][2], gases[gas_name][3])
-        EMF_high = limit(emf_from_ppm(temp_max, rh_max, gases[gas_name][1], gas_name, t), gases[gas_name][2], gases[gas_name][3])
-        
-        if EMF_low >= EMF_high:
-            EMF_low = gases[gas_name][2]
-
-        EMF_values = vals(EMF_low, EMF_high, 30)
+        EMF_values = vals(emf_min, emf_max, 30)
         ppm_stack = []
 
         for emf in EMF_values:
@@ -222,8 +168,6 @@ for gas_name in gases:
     initial_z = all_surfaces[0]
 
     for idx, ppm_grid in enumerate(initial_z):
-        emf_min = gases[gas_name][2]
-        emf_max = gases[gas_name][3]
         emf = EMF_values[idx]
         SensorValue = interpolate(emf, emf_max, emf_min, 0, 1)
         fig.add_trace(go.Surface(x=T, y=RH, z=ppm_grid, colorscale='Viridis', showscale=False, name=f"Sensor: {SensorValue:.4f}"))
@@ -275,4 +219,3 @@ for gas_name in gases:
     print(f"{gas_name} html file completed.")
 
     pio.write_html(fig, file=f"MG811_{gas_name}_ppm.html")
-
