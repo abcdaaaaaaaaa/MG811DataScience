@@ -139,7 +139,7 @@ def calculate_correction(t):
     t_corr = t if t < 20 else t % 20.0
     return 3500 / inverseyaxb(a_corr, time_curve(t_corr), b_corr)
 
-def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
+def emf_from_ppm(temp, rh, ppm, gas_name, t):
     a_temp, b_temp = interpolate_from_table(temp, temp_data)
     a_rh, b_rh = interpolate_from_table(rh, rh_data)
     correction = calculate_correction(t)
@@ -275,3 +275,4 @@ for gas_name in gases:
     print(f"{gas_name} html file completed.")
 
     pio.write_html(fig, file=f"MG811_{gas_name}_ppm.html")
+
