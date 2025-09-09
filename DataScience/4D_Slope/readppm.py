@@ -70,7 +70,7 @@ def time_curve(x):
     else:
         return np.nan
 
-def get_constants_from_emf(name, emf):
+def get_constants(name, emf):
     a = np.full_like(emf, None, dtype=float)
     b = np.full_like(emf, None, dtype=float)
 
@@ -107,44 +107,6 @@ def get_constants_from_emf(name, emf):
 
     return a, b
 
-def get_constants_from_ppm(name, ppm):
-    a = np.full_like(ppm, None, dtype=float)
-    b = np.full_like(ppm, None, dtype=float)
-
-    match name:
-        case 'CH4':
-            a = 326.7924
-            b = -0.0017
-
-        case 'C2H5OH':
-            cond1 = (ppm < 600)
-            cond2 = (ppm >= 600) & (ppm < 800)
-            cond3 = (ppm >= 800)
-
-            a[cond1], b[cond1] = 327.3446, -0.0024
-            a[cond2], b[cond2] = 350.0226, -0.0129
-            a[cond3], b[cond3] = 333.2081, -0.0056
-
-        case 'CO':
-            cond1 = (ppm < 600)
-            cond2 = (ppm >= 600) & (ppm < 1000)
-            cond3 = (ppm >= 1000) & (ppm < 1500)
-            cond4 = (ppm >= 1500) & (ppm < 4000)
-            cond5 = (ppm >= 4000)
-
-            a[cond1], b[cond1] = 332.606, -0.0061
-            a[cond2], b[cond2] = 383.6791, -0.0284
-            a[cond3], b[cond3] = 827.293, -0.1396
-            a[cond4], b[cond4] = 468.501, -0.0618
-            a[cond5], b[cond5] = 483.2887, -0.0654
-
-        case 'CO2':
-            a = 499.0689
-            b = -0.0722
-
-    return a, b
-
-
 def correction_time(t):
     return t if t < 20 else t % 20.0
 
@@ -153,32 +115,6 @@ def calculate_correction(t):
     a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3 # 499.0689: CO2_a
     b_corr = (temp_corr_b + -0.0733 + -0.0722) / 3 # -0.0722: CO2_b
     return 3500 / inverseyaxb(a_corr, time_curve(correction_time(t)), b_corr)
-
-def emf_from_ppm(temp, rh, ppm, gas_name, t_corr):
-    if np.isscalar(temp):
-        a_temp, b_temp = interpolate_from_table(temp, temp_data)
-    else:
-        temp_interp = np.array([interpolate_from_table(t, temp_data) for t in temp])
-        a_temp, b_temp = temp_interp[:, 0], temp_interp[:, 1]
-
-    if np.isscalar(rh):
-        a_rh, b_rh = interpolate_from_table(rh, rh_data)
-    else:
-        rh_interp = np.array([interpolate_from_table(r, rh_data) for r in rh])
-        a_rh, b_rh = rh_interp[:, 0], rh_interp[:, 1]
-
-    if np.isscalar(t_corr):
-        correction = calculate_correction(t_corr)
-    else:
-        correction = np.array([calculate_correction(t) for t in t_corr])
-
-    gas_a, gas_b = get_constants_from_ppm(gas_name, ppm / correction)
-
-    a_avg = (a_temp + a_rh + gas_a) / 3
-    b_avg = (b_temp + b_rh + gas_b) / 3
-
-    EMF = yaxb(a_avg, (ppm / correction), b_avg)
-    return EMF
 
 def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
     if np.isscalar(temp):
@@ -193,7 +129,7 @@ def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
         rh_interp = np.array([interpolate_from_table(r, rh_data) for r in rh])
         a_rh, b_rh = rh_interp[:, 0], rh_interp[:, 1]
 
-    gas_a, gas_b = get_constants_from_emf(gas_name, EMF)
+    gas_a, gas_b = get_constants(gas_name, EMF)
 
     a_avg = (a_temp + a_rh + gas_a) / 3
     b_avg = (b_temp + b_rh + gas_b) / 3
@@ -290,8 +226,7 @@ ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue
 print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}")
 
 for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_surface, rh_surface, SensorValue_surface, correction_coefficient_surface):
-    EMF_input = interpolate(sv_val, 0, 1, emf_max, emf_min)
-    ppm_val = Sensorppm(temp_val, rh_val, EMF_input, selected_gas, t_val, True)
-    EMF_val = emf_from_ppm(temp_val, rh_val, ppm_val, selected_gas, t_val)
+    EMF_val = interpolate(sv_val, 0, 1, emf_max, emf_min)
+    ppm_val = Sensorppm(temp_val, rh_val, EMF_val, selected_gas, t_val, True)
     print(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}")
 print("")
