@@ -53,3 +53,19 @@
 <img width="1264" height="517" alt="ppm3" src="https://github.com/user-attachments/assets/28ba36af-a4e6-4f64-ab67-1bc941609952" />
 <img width="1264" height="676" alt="ppm4" src="https://github.com/user-attachments/assets/87acce1b-ab91-4c04-a5da-b11fdcb313dd" />
 <img width="1264" height="738" alt="ppm5" src="https://github.com/user-attachments/assets/3af8d549-2d08-4757-8254-eb57059afd7b" />
+
+## Check out all our DataScience libraries under the SpaceData series!
+
+<b> "The first and only Arduino library series where Gas Sensors and Geiger Counter combine with Data Science"
+
+| Library | Scope |
+|---------|---------|
+| <a href="https://github.com/abcdaaaaaaaaa/MQDataScience">MQDataScience  | MQ2, MQ3, MQ4, MQ5, MQ6, MQ7, MQ8, MQ9, MQ131_LOW, MQ131_HIGH, MQ135, MQ136, MQ137, MQ138, MQ214, MQ216, MQ303A, MQ303B, MQ306A, MQ307A, MQ309A Gas Sensors  |
+| <a href="https://github.com/abcdaaaaaaaaa/TGSDataScience">TGSDataScience  | TGS2600, TGS2610, TGS2611 TGS2620, TGS2612, TGS2442, TGS2201, TGS4161, TGS8100, TGS813, TGS822, TGS2602, TGS6812 Gas Sensors |
+| <a href="https://github.com/abcdaaaaaaaaa/MG811DataScience">MG811DataScience  | MG811 Gas Sensor  |
+| <a href="https://github.com/abcdaaaaaaaaa/SP3S-AQ2DataScience">SP3S-AQ2DataScience  | SP3S-AQ2-01 Gas Sensor  |
+| <a href="https://github.com/abcdaaaaaaaaa/RadioactiveDataScience">RadioactiveDataScience  | Geiger Counter  |
+
+## For detailed explanation, You can also check out the github <a href="https://github.com/abcdaaaaaaaaa/MG811DataScience/wiki">Wiki Page!
+
+## You can access the library's article <a href="https://www.spacepedia.info/MG811DataScience">Here!
