@@ -36,10 +36,10 @@
 <img width="750" alt="4dformullas" src="https://github.com/user-attachments/assets/7c5a1464-fcb9-4a8f-9693-c2c473f1ec1a" />
 
 ## 6) 4D Surface Diagram for MG811 Gases
-<img width="1264" height="577" alt="CO2 4D ppm surface" src="https://github.com/user-attachments/assets/cee56fe4-78dd-46e5-a097-5ccaa0deaa26" />
-<img width="1264" height="577" alt="CH4 4D ppm surface" src="https://github.com/user-attachments/assets/2de201f0-2ef2-4a3d-ae0d-f090a177906a" />
-<img width="1264" height="577" alt="C2H5OH 4D ppm surface" src="https://github.com/user-attachments/assets/7ed29ac7-9a81-4ae0-9d57-abaf301c25d4" />
-<img width="1264" height="577" alt="CO 4D ppm surface" src="https://github.com/user-attachments/assets/aa13e593-cd1f-4785-aae8-34a5f25e020e" />
+<img width="1264" height="577" alt="CO2 4D ppm surface" src="https://github.com/user-attachments/assets/d75acaff-04df-4993-a111-f800c30b70cf" />
+<img width="1264" height="577" alt="CH4 4D ppm surface" src="https://github.com/user-attachments/assets/012d06c4-94fd-477a-8145-9de40c7fa606" />
+<img width="1264" height="577" alt="C2H5OH 4D ppm surface" src="https://github.com/user-attachments/assets/85bdd50e-40da-4b27-9a8d-6e3ee0082502" />
+<img width="1264" height="577" alt="CO 4D ppm surface" src="https://github.com/user-attachments/assets/6d159e02-690c-4f70-a47c-bbb8b31cb5f3" />
 
 ## Ppm Formullas
 | Gas    | EMF_min | EMF_max |
