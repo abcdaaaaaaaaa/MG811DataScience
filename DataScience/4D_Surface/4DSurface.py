@@ -67,20 +67,20 @@ def get_constants(name, emf):
             b = -0.0017
 
         case 'C2H5OH':
-            cond1 = (emf <= 323.616) & (emf > 322.2195)
+            cond1 = (emf > 322.2195)
             cond2 = (emf <= 322.2195) & (emf > 321.0224)
-            cond3 = (emf <= 321.0224) & (emf >= 320.6234)
+            cond3 = (emf <= 321.0224)
 
             a[cond1], b[cond1] = 327.3446, -0.0024
             a[cond2], b[cond2] = 350.0226, -0.0129
             a[cond3], b[cond3] = 333.2081, -0.0056
 
         case 'CO':
-            cond1 = (emf <= 323.616) & (emf > 320.0249)
+            cond1 = (emf > 320.0249)
             cond2 = (emf <= 320.0249) & (emf > 315.4364)
             cond3 = (emf <= 315.4364) & (emf > 298.0798)
             cond4 = (emf <= 298.0798) & (emf > 280.5237)
-            cond5 = (emf <= 280.5237) & (emf >= 264.1646)
+            cond5 = (emf <= 280.5237)
 
             a[cond1], b[cond1] = 332.606, -0.0061
             a[cond2], b[cond2] = 383.6791, -0.0284
@@ -219,3 +219,4 @@ for gas_name in gases:
     print(f"{gas_name} html file completed.")
 
     pio.write_html(fig, file=f"MG811_{gas_name}_ppm.html")
+
