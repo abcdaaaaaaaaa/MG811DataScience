@@ -75,17 +75,17 @@ float MG811::calculateppm(float SensorValue, float temp, float rh, float correct
             break;
     
         case 1: // C2H5OH
-            if (emf <= 323.616 && emf > 322.2195) { a_gas = 327.3446; b_gas = -0.0024; }
+            if (emf > 322.2195) { a_gas = 327.3446; b_gas = -0.0024; }
             else if (emf <= 322.2195 && emf > 321.0224) { a_gas = 350.0226; b_gas = -0.0129; }
-            else if (emf <= 321.0224 && emf >= 320.6234) { a_gas = 333.2081; b_gas = -0.0056; }
+            else if (emf <= 321.0224) { a_gas = 333.2081; b_gas = -0.0056; }
             break;
     
         case 2: // CO
-            if (emf <= 323.616 && emf > 320.0249) { a_gas = 332.606; b_gas = -0.0061; }
+            if (emf > 320.0249) { a_gas = 332.606; b_gas = -0.0061; }
             else if (emf <= 320.0249 && emf > 315.4364) { a_gas = 383.6791; b_gas = -0.0284; }
             else if (emf <= 315.4364 && emf > 298.0798) { a_gas = 827.293; b_gas = -0.1396; }
             else if (emf <= 298.0798 && emf > 280.5237) { a_gas = 468.501; b_gas = -0.0618; }
-            else if (emf <= 280.5237 && emf >= 264.1646) { a_gas = 483.2887; b_gas = -0.0654; }
+            else if (emf <= 280.5237) { a_gas = 483.2887; b_gas = -0.0654; }
             break;
     
         case 3: // CO2
@@ -142,4 +142,5 @@ float MG811::TheoreticalCO2(float x) {
   float polynomial = 5.0000 * pow(x, 1) + 6.5833 * pow(x, 2) - 4.9167 * pow(x, 3); // RMSE: 0.8484
   return 1000.0 - 600.0 * exp(-polynomial);
 }
+
 
