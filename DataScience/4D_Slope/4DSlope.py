@@ -42,7 +42,7 @@ def vals(minval, maxval, count):
     return np.linspace(minval, maxval, count)
 
 def limit(value, minlim, maxlim):
-    return np.minimum(np.maximum(value, minlim), maxlim)
+    return np.clip(value, minlim, maxlim)
 
 def time_curve(x):
     if 0 <= x <= 1:
@@ -438,6 +438,7 @@ fig.write_html(f"MG811_{selected_gas}_4D_Slope_Estimation.html")
 
 print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}")
 with open("DataReport.txt", "a") as f:
+    f.write("\n")
     f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
 
 for t_val, temp_val, rh_val, sv_val, corr_val in zip(time, temperature, rh, SensorValue, correction_coefficient):
@@ -447,10 +448,9 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time, temperature, rh, Sens
     with open("DataReport.txt", "a") as f:
         f.write(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}\n")
 print("")
-with open("DataReport.txt", "a") as f:
-    f.write("\n")
-    
+
 with open("EstimationReport.txt", "a") as f:
+    f.write("\n")
     f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
 
 for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_surface, rh_surface, SensorValue_surface, correction_coefficient_surface):
@@ -460,5 +460,3 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
     with open("EstimationReport.txt", "a") as f:
         f.write(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}\n")
 print("")
-with open("EstimationReport.txt", "a") as f:
-    f.write("\n")
