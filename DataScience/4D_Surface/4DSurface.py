@@ -15,7 +15,7 @@ def vals(minval, maxval, count):
     return np.linspace(minval, maxval, count)
 
 def limit(value, minlim, maxlim):
-    return np.minimum(np.maximum(value, minlim), maxlim)
+    return np.clip(value, minlim, maxlim)
 
 def time_curve(x):
     if 0 <= x <= 1:
@@ -219,4 +219,5 @@ for gas_name in gases:
     print(f"{gas_name} html file completed.")
 
     pio.write_html(fig, file=f"MG811_{gas_name}_ppm.html")
+
 
