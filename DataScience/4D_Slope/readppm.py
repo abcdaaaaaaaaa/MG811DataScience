@@ -42,7 +42,7 @@ def vals(minval, maxval, count):
     return np.linspace(minval, maxval, count)
 
 def limit(value, minlim, maxlim):
-    return np.minimum(np.maximum(value, minlim), maxlim)
+    return np.clip(value, minlim, maxlim)
 
 def time_curve(x):
     if 0 <= x <= 1:
@@ -230,4 +230,3 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
     ppm_val = Sensorppm(temp_val, rh_val, EMF_val, selected_gas, t_val, True)
     print(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}")
 print("")
-
