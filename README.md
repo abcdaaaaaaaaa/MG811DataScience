@@ -23,14 +23,14 @@
 ### 1) Multi-Period Mode
 <img width="1264" height="577" alt="CO2 4D ppm slope" src="https://github.com/user-attachments/assets/7fe5aae6-3eeb-49fe-9859-fbe07320fa1b" />
 <img width="1264" height="577" alt="CH4 4D ppm slope" src="https://github.com/user-attachments/assets/c7ffbd0b-d7d0-4227-9b49-9c9ac99e1a14" />
-<img width="1264" height="577" alt="C2H5OH 4D ppm slope" src="https://github.com/user-attachments/assets/77722502-6d03-4b62-9618-8843ba35f9ba" />
-<img width="1264" height="577" alt="CO 4D ppm slope" src="https://github.com/user-attachments/assets/be028b72-cecc-4ded-81b2-e24ade9aa855" />
+<img width="1264" height="577" alt="C2H5OH 4D ppm slope" src="https://github.com/user-attachments/assets/27b2ce6f-bf33-43a8-926a-0b766b1b4c09" />
+<img width="1264" height="577" alt="CO 4D ppm slope" src="https://github.com/user-attachments/assets/9493ce5d-901c-4fc1-9b02-fe0586aac040" />
 
 ### 2) Single-Period Mode
 <img width="1264" height="577" alt="CO2 4D ppm slope-2" src="https://github.com/user-attachments/assets/ece88c87-7eff-4c7c-9175-62b782e8c77c" />
 <img width="1264" height="577" alt="CH4 4D ppm slope-2" src="https://github.com/user-attachments/assets/15fb11dd-b683-4ba1-8a97-691ba6f8b737" />
-<img width="1264" height="577" alt="C2H5OH 4D ppm slope-2" src="https://github.com/user-attachments/assets/eaa2ae1f-13a2-41fe-ac63-3bbabcb53866" />
-<img width="1264" height="577" alt="CO 4D ppm slope-2" src="https://github.com/user-attachments/assets/e502eca7-b96b-4027-a6ee-2ab7d05decb1" />
+<img width="1264" height="577" alt="C2H5OH 4D ppm slope-2" src="https://github.com/user-attachments/assets/6ef5dd7b-da81-4f87-a3a8-6d724373deea" />
+<img width="1264" height="577" alt="CO 4D ppm slope-2" src="https://github.com/user-attachments/assets/d1d7955b-b757-4583-80f5-5e6325f44ca5" />
 
 ## 4D Axis Features:
 <img width="750" alt="4dformullas" src="https://github.com/user-attachments/assets/7c5a1464-fcb9-4a8f-9693-c2c473f1ec1a" />
