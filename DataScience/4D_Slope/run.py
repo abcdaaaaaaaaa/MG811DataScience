@@ -18,13 +18,11 @@ with open("DataReport.txt", "a") as f:
     f.write(formatted)
     f.write("\n")
     f.write("\n")
-    f.write("\n")
 
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
     f.write("\n")
     f.write(formatted)
-    f.write("\n")
     f.write("\n")
     f.write("\n")
 
