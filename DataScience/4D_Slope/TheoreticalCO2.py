@@ -92,6 +92,12 @@ maxval = np.max(SensorValue_surface)
 
 fig = go.Figure()
 
+with open("DataReport.txt", "a") as f:
+    f.write("\n")
+    
+with open("EstimationReport.txt", "a") as f:
+    f.write("\n")
+
 print(f"Gas: Theoretical CO2 | R²_Per={round4(r2_percentile_time)} |")
 
 with open("DataReport.txt", "a") as f:
