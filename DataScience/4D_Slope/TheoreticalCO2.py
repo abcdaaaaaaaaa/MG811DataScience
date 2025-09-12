@@ -5,7 +5,6 @@ from plotly.subplots import make_subplots
 from scipy.optimize import curve_fit
 import pandas as pd
 
-
 df = pd.read_excel("4D_Datas.xlsx")
 
 getcontext().prec = 200
@@ -95,8 +94,31 @@ fig = go.Figure()
 
 print(f"Gas: Theoretical CO2 | R²_Per={round4(r2_percentile_time)} |")
 
+with open("DataReport.txt", "a") as f:
+    f.write(f"Gas: Theoretical CO2 | R²_Per={round4(r2_percentile_time)} |\n")
+
 with open("EstimationReport.txt", "a") as f:
     f.write(f"Gas: Theoretical CO2 | R²_Per={round4(r2_percentile_time)} |\n")
+
+for i, sv in enumerate(SensorValue):
+    sensor_value = Decimal(sv)
+    V_out = sensor_value / Decimal(10)
+    P_co2 = ((E_c - V_out) / coeff).exp()
+    ppm = P_co2 * Decimal(1e6)
+
+    current_ppm = round(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
+    if (current_ppm != min_co2_ppm and current_ppm != max_co2_ppm): 
+        current_ppm = round4(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
+
+    if current_ppm >= 1000:
+        current_ppm = 1000
+
+    ppm_values.append(float(current_ppm))
+
+    print(f"t={time[i]:.4f}s Sensor={sensor_value:.4f} ppm={current_ppm:.4f}")
+    with open("DataReport.txt", "a") as f:
+        f.write(f"t={time[i]:.4f}s Sensor={sensor_value:.4f} ppm={current_ppm:.4f}\n")
+print("")
 
 for i, sv in enumerate(SensorValue_surface):
     sensor_value = Decimal(sv)
@@ -114,25 +136,9 @@ for i, sv in enumerate(SensorValue_surface):
     ppm_values_surface.append(float(current_ppm))
 
     print(f"t={time_surface[i]:.4f}s Sensor={sensor_value:.4f} ppm={current_ppm:.4f}")
-
     with open("EstimationReport.txt", "a") as f:
         f.write(f"t={time_surface[i]:.4f}s Sensor={sensor_value:.4f} ppm={current_ppm:.4f}\n")
-
-
-for sv in SensorValue:
-    sensor_value = Decimal(sv)
-    V_out = sensor_value / Decimal(10)
-    P_co2 = ((E_c - V_out) / coeff).exp()
-    ppm = P_co2 * Decimal(1e6)
-
-    current_ppm = round(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
-    if (current_ppm != min_co2_ppm and current_ppm != max_co2_ppm): 
-        current_ppm = round4(exponential_interpolate(interpolate(ppm, min_ppm, max_ppm, max_sensor_value, min_sensor_value), min_sensor_value, max_sensor_value, min_co2_ppm, max_co2_ppm))
-
-    if current_ppm >= 1000:
-        current_ppm = 1000
-
-    ppm_values.append(float(current_ppm))
+print("")
     
 fig = make_subplots(rows=1, cols=2)
 
@@ -152,4 +158,3 @@ fig.update_layout(
 )
 
 fig.write_html(f"MG811_Theoretical_CO2_Slope_Estimation.html")
-
