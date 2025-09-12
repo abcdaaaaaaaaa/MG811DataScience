@@ -437,6 +437,19 @@ fig.add_annotation(text=f"MG811 {selected_gas} Time-based PPM Calculation", x=0.
 fig.write_html(f"MG811_{selected_gas}_4D_Slope_Estimation.html")
 
 print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}")
+with open("DataReport.txt", "a") as f:
+    f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
+
+for t_val, temp_val, rh_val, sv_val, corr_val in zip(time, temperature, rh, SensorValue, correction_coefficient):
+    EMF_val = interpolate(sv_val, 0, 1, emf_max, emf_min)
+    ppm_val = Sensorppm(temp_val, rh_val, EMF_val, selected_gas, t_val, True)
+    print(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}")
+    with open("DataReport.txt", "a") as f:
+        f.write(f"t={t_val:.4f}s Sensor={sv_val:.4f} temp={temp_val:.4f} rh={rh_val:.4f} corr={corr_val:.4f} EMF={EMF_val:.4f} ppm={ppm_val:.4f}\n")
+print("")
+with open("DataReport.txt", "a") as f:
+    f.write("\n")
+    
 with open("EstimationReport.txt", "a") as f:
     f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
 
@@ -449,4 +462,3 @@ for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_s
 print("")
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
-
