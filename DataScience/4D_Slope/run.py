@@ -12,6 +12,14 @@ print(formatted)
 print("")
 print("")
 
+with open("DataReport.txt", "a") as f:
+    f.write("\n")
+    f.write("\n")
+    f.write(formatted)
+    f.write("\n")
+    f.write("\n")
+    f.write("\n")
+
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
     f.write("\n")
@@ -34,6 +42,3 @@ for line in process.stdout:
     print(line, end='')
 
 process.wait()
-
-
-
