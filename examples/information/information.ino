@@ -6,5 +6,5 @@
   To generate regression curves of all supported MG811 gases: https://github.com/abcdaaaaaaaaa/MG811DataScience/blob/main/DataScience/Regression/MG811_Curves.py
 
 ---------- Library Examples Files ----------
-  To process your SP3S-AQ2-01 into the microcontroller: SP3SAQ2.ino
+  To process your MG811 into the microcontroller: MG811.ino
   To have general information about all the files in the library: information.ino
