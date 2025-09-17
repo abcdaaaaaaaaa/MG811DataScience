@@ -1,5 +1,5 @@
 // (1) The library also supports data science applications such as gradient 4D Slope Estimation from Python!:
-// (1) https://github.com/abcdaaaaaaaaa/MG811DataScience/blob/main/DataScience/4D_Slope
+// (1) https://github.com/abcdaaaaaaaaa/MG811DataScience/tree/main/DataScience/4D_Slope
 
 #include <MG811.h>
 
@@ -103,4 +103,3 @@ void loop() {
       }
     }
 }
-
