@@ -88,5 +88,3 @@ void sendData() {
 
   Serial.println("----------");
 }
-
-
