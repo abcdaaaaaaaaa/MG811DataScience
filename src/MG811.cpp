@@ -33,7 +33,7 @@ float MG811::inverseYaxb(float a, float y, float b) {
     return pow(y / a, 1.0 / b);
 }
 
-float MG811::correction_time(unsigned long t) {
+float MG811::correction_time(float t) {
     return (t < 20) ? t : fmod(t, 20.0);
 }
 
@@ -52,14 +52,13 @@ float MG811::time_curve(float x) {
     else return NAN;
 }
 
-float MG811::calculateCorrection(unsigned long t) {
+float MG811::calculateCorrection(float x) {
     float temp_corr_a = fmap(28, 20, 30, 523.094, 527.0596);
     float temp_corr_b = fmap(28, 20, 30, -0.0863, -0.0879);
 
     float a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3.0;
     float b_corr = (temp_corr_b + -0.0733 + -0.0722) / 3.0;
 
-    float x = correction_time(t);
     float curve = time_curve(x);
     return 3500.0 / inverseYaxb(a_corr, curve, b_corr);
 }
@@ -142,5 +141,3 @@ float MG811::TheoreticalCO2(float x) {
   float polynomial = 5.0000 * pow(x, 1) + 6.5833 * pow(x, 2) - 4.9167 * pow(x, 3); // RMSE: 0.8484
   return 1000.0 - 600.0 * exp(-polynomial);
 }
-
-
