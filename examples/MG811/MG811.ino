@@ -4,7 +4,7 @@
 #include <MG811.h>
 
 // For https://github.com/abcdaaaaaaaaa/MG811DataScience/blob/main/DataScience/4D_Slope/4D_Datas.xlsx the Time column should be defined as 9, 29, 49... 9 + 20k.
-// If you want to define the Time function as 1, 2, 3 as in the standard, you can remove the delays or define it as delay(1000).
+// If you want to define the Time function as 1, 2, 3 as in the standard, you can remove the delay periods.
 // On the other hand, the range in which the sensor can measure with the highest accuracy is specified in the data sheet as 7-11 seconds in 20-second periods.
 
 #define ADC_BIT_RESU (12) // for ESP32
@@ -88,3 +88,4 @@ void sendData() {
 
   Serial.println("----------");
 }
+
