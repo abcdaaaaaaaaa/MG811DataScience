@@ -20,7 +20,7 @@ MG811 sensor(ADC_BIT_RESU, pin);
 
 void setup() {
     Serial.begin(115200); // for ESP32
-    sensor.begin(); // WARNING: To get accurate results, please use the resistance (RL) value recommended in the data sheet.
+    sensor.begin(); // WARNING: To get accurate results, please use the 6.0V ±0.1V instead of 5.0V.
 }
 
 void loop() {
@@ -103,3 +103,4 @@ void loop() {
       }
     }
 }
+
