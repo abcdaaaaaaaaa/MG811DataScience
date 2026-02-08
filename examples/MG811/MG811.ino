@@ -10,11 +10,12 @@
 #define ADC_BIT_RESU (12) // for ESP32
 #define pin          (35) // D35 (ADC1)
 
-unsigned long startTime = 0;
-bool measuring = false;
-bool firstReadDone = false;
+float startTime = 0;
 
-float sensorVal, CO2, CH4, C2H5OH, CO, TheoreticalCO2, temp, rh, Correction;
+bool measuring = false;
+bool windowLock = false;
+
+float sensorVal, CO2, CH4, C2H5OH, CO, TheoreticalCO2, temp, rh, Time, Correction;
 
 MG811 sensor(ADC_BIT_RESU, pin);
 
@@ -28,79 +29,62 @@ void loop() {
     rh = 33.0;   // DHT22 is recommended %  (Relative Humidity)
     
     sensorVal = sensor.read();
-  
-    if (sensorVal > 0 && !measuring) {
-      startTime = millis() / 1000;
-      measuring = true;
-      firstReadDone = false;
-      delay(9000);
 
-      Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
-      TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
-      
-      CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, 0);
-      C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, 1);
-      CO = sensor.calculateppm(sensorVal, temp, rh, Correction, 2);
-      CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, 3);
-        
-      Serial.println();
-      Serial.print("Correction Coefficient: ");
-      Serial.println(Correction);
-      Serial.print("TheoreticalCO2: ");
-      Serial.println(TheoreticalCO2);
-      Serial.println();
-      
-      Serial.print("CO2: ");
-      Serial.println(CO2);
-      Serial.print("CH4: ");
-      Serial.println(CH4);
-      Serial.print("C2H5OH: ");
-      Serial.println(C2H5OH);
-      Serial.print("CO: ");
-      Serial.println(CO);
-      
-      firstReadDone = true;
+  if(sensorVal == 0) {
+    measuring = false;
+    startTime = 0;
+    windowLock = false;
+    return;
+  }
 
-      Serial.println("----------");
-      delay(20000);
-    }
-  
-    while (measuring) {
-      sensorVal = sensor.read();
-      
-      if (sensorVal == 0) {
-        measuring = false;
-        startTime = 0;
-        break;
+  if(!measuring && sensorVal > 0) {
+    startTime = millis() / 1000.0;
+    measuring = true;
+    windowLock = false;
+  }
+
+  if(measuring) {
+    float t = sensor.correction_time((millis() / 1000.0) - startTime);
+
+    if(t >= 9 && t <= 11) {
+      if(!windowLock) {
+        sendData();
+        windowLock = true;
       }
-      
-      if (firstReadDone) { 
-        Correction = sensor.calculateCorrection((millis() / 1000) - startTime);
-        TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
-
-        CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, 0);
-        C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, 1);
-        CO = sensor.calculateppm(sensorVal, temp, rh, Correction, 2);
-        CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, 3);
-          
-        Serial.print("Correction Coefficient: ");
-        Serial.println(Correction);
-        Serial.print("TheoreticalCO2: ");
-        Serial.println(TheoreticalCO2);
-        Serial.println();
-        
-        Serial.print("CO2: ");
-        Serial.println(CO2);
-        Serial.print("CH4: ");
-        Serial.println(CH4);
-        Serial.print("C2H5OH: ");
-        Serial.println(C2H5OH);
-        Serial.print("CO: ");
-        Serial.println(CO);
-
-        Serial.println("----------");
-        delay(20000);
-      }
+    } else {
+      windowLock = false;
     }
+  }
+}  
+
+void sendData() {
+  Time = sensor.correction_time((millis() / 1000.0) - startTime);
+  Correction = sensor.calculateCorrection(Time);
+  TheoreticalCO2 = sensor.TheoreticalCO2(sensorVal);
+
+  CH4 = sensor.calculateppm(sensorVal, temp, rh, Correction, 0);
+  C2H5OH = sensor.calculateppm(sensorVal, temp, rh, Correction, 1);
+  CO = sensor.calculateppm(sensorVal, temp, rh, Correction, 2);
+  CO2 = sensor.calculateppm(sensorVal, temp, rh, Correction, 3);
+
+  Serial.print("Correction Coefficient: ");
+  Serial.print(Correction);
+  Serial.print(" / ");
+  Serial.print(Time);
+  Serial.print("s");
+  Serial.println();
+  Serial.print("TheoreticalCO2: ");
+  Serial.println(TheoreticalCO2);
+  Serial.println();
+  
+  Serial.print("CO2: ");
+  Serial.println(CO2);
+  Serial.print("CH4: ");
+  Serial.println(CH4);
+  Serial.print("C2H5OH: ");
+  Serial.println(C2H5OH);
+  Serial.print("CO: ");
+  Serial.println(CO);
+
+  Serial.println("----------");
 }
-
