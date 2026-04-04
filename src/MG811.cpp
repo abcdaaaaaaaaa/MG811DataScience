@@ -23,7 +23,6 @@ void MG811::begin() {
 float MG811::read() {
     int adc = analogRead(_pin);
     return 1.0 - ((float)adc / (float)_bitadc); // Because the MG811 sensor operates based on voltage rather than direct proportional signal, unlike other analog sensors, the value must be inverted.
-
 }
 
 float MG811::fmap(float x, float in_min, float in_max, float out_min, float out_max) {
