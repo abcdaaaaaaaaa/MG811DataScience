@@ -1,6 +1,6 @@
-# MG811DataScience v5.5.5
+# MG811DataScience v5.5.6
 
-## MG811DataScience What can be create?
+## What can be created?
 "The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
 
 ## 1) Advanced Data Science System for Regression Calculations
