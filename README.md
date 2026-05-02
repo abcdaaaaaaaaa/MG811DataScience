@@ -1,4 +1,4 @@
-# MG811DataScience v5.5.6
+# MG811DataScience v5.5.7
 
 ## What can be created?
 "The first and only Arduino library where MG811 Gas Sensor combine with Data Science"
@@ -68,4 +68,4 @@
 
 ## For detailed explanation, You can also check out the github <a href="https://github.com/abcdaaaaaaaaa/MG811DataScience/wiki">Wiki Page!
 
-## You can access the library's article <a href="https://www.spacepedia.info/MG811DataScience">Here!
+## You can access the library's article <a href="https://project.uzay.info/MG811DataScience">Here!
