@@ -4,6 +4,7 @@ from scipy.optimize import curve_fit
 import plotly.colors as pc
 import pandas as pd
 import sys
+import EstimateData
 
 df = pd.read_excel("4D_Datas.xlsx")
 
@@ -14,9 +15,6 @@ def roundf(*args):
 
 def round2(value):
     return round(value, 2)
-
-def yaxb(valuea, value, valueb):
-    return valuea * np.power(value, valueb)
 
 def inverseyaxb(valuea, value, valueb):
     return np.power(value / valuea, 1 / valueb)
@@ -145,30 +143,6 @@ def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
     ppm = inverseyaxb(a_avg, EMF, b_avg) * correction
     return ppm
 
-def calculate_r2(y, y_pred):
-    ss_res = np.sum((y - y_pred) ** 2)
-    ss_tot = np.sum((y - np.mean(y)) ** 2)
-    r2 = 1 - (ss_res / ss_tot)
-    return r2
-
-def fit_time_with_r2(x, y):
-    popt, _ = curve_fit(lambda x, a, b: yaxb(a, x, b), x, y)
-    a, b = popt
-    y_pred = yaxb(a, x, b)
-    r2 = calculate_r2(y, y_pred)
-    return a, b, r2
-
-def fit_daily_sine(t_sec, temps, period=86400.0):
-    w = 2*np.pi/period
-    t_sec = np.array(t_sec, dtype=float)
-    temps = np.array(temps, dtype=float)
-    X = np.column_stack([np.ones_like(t_sec), np.sin(w*t_sec), np.cos(w*t_sec)])
-    coeffs, *_ = np.linalg.lstsq(X, temps, rcond=None)
-    return coeffs[0], coeffs[1], coeffs[2], w
-
-def predict_temp(t, M, C, D, w):
-    return M + C*np.sin(w*t) + D*np.cos(w*t)
-
 temp_data = {
     -10: (522.7202, -0.0843),
     0: (517.0238, -0.0833),
@@ -197,31 +171,35 @@ emf_max = gases[selected_gas][3]
 
 time, percentile, temperature, rh = np.array(df["Time"], dtype=float), np.array(df["Per"], dtype=float), np.array(df["Temp"], dtype=float), np.array(df["Rh"], dtype=float)
 percentile, temperature, rh = limit(percentile, 0, 100), limit(temperature, -10, 50), limit(rh, 0, 100)
-M, C, D, w = fit_daily_sine(time, temperature)
+
 SensorValue = percentile / 100
 correction_coefficient = np.array([calculate_correction(t) for t in time])
 corrected_time = time if min(time)==1 else (time - min(time)) / 20 + 1
-temp_time = np.array([predict_temp(t, M, C, D, w) for t in time])
-r2_temp_time = calculate_r2(temperature, temp_time)
-
-a_rh_time, b_rh_time, r2_rh_time = fit_time_with_r2(corrected_time, rh)
-a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(corrected_time, percentile)
-
-a_rh_time, b_rh_time, r2_rh_time, r2_temp_time = roundf(a_rh_time, b_rh_time, r2_rh_time, r2_temp_time)
-a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_time, b_percentile_time, r2_percentile_time)
 
 time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time) - min(time)) * 2 + min(time) + 20, 200)
 corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
-temperature_surface = limit(np.array([predict_temp(t, M, C, D, w) for t in time_surface]), -10, 50)
-rh_surface = limit(yaxb(a_rh_time, corrected_time_surface, b_rh_time), 0, 100)
+
+r2_temp_time, temperature_surface_raw, model_temp = EstimateData.get_best_fit(corrected_time, temperature, corrected_time_surface)
+temperature_surface = limit(temperature_surface_raw, -10, 50)
+
+r2_rh_time, rh_surface_raw, model_rh = EstimateData.get_best_fit(corrected_time, rh, corrected_time_surface, temp=temperature, temp_surface=temperature_surface)
+rh_surface = limit(rh_surface_raw, 0, 100)
+
+r2_percentile_time, percentile_surface_raw, model_per = EstimateData.get_best_fit(corrected_time, percentile, corrected_time_surface, temp=temperature, temp_surface=temperature_surface)
+percentile_surface = limit(percentile_surface_raw, 0, 100)
+
 correction_coefficient_surface = np.array([calculate_correction(t) for t in time_surface])
-percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
 
 ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, True)
 # false_ppm = Sensorppm(temperature, rh, interpolate(SensorValue, 0, 1, emf_max, emf_min), selected_gas, time, False)
 ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, True)
 # false_ppm_surface = Sensorppm(temperature_surface, rh_surface, interpolate(SensorValue_surface, 0, 1, emf_max, emf_min), selected_gas, time_surface, False)
+
+print(f"Percentile Model: {model_per}")
+print(f"Temperature Model: {model_temp}")
+print(f"RH Model: {model_rh}")
+print()
 
 print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}")
 
