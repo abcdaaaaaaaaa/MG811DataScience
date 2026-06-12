@@ -4,6 +4,7 @@ from scipy.optimize import curve_fit
 import plotly.colors as pc
 import pandas as pd
 import sys
+import EstimateData
 
 df = pd.read_excel("4D_Datas.xlsx")
 
@@ -14,9 +15,6 @@ def roundf(*args):
 
 def round2(value):
     return round(value, 2)
-
-def yaxb(valuea, value, valueb):
-    return valuea * np.power(value, valueb)
 
 def inverseyaxb(valuea, value, valueb):
     return np.power(value / valuea, 1 / valueb)
@@ -71,8 +69,8 @@ def time_curve(x):
         return np.nan
 
 def get_constants(name, emf):
-    a = np.full_like(emf, None, dtype=float)
-    b = np.full_like(emf, None, dtype=float)
+    a = np.full_like(emf, np.nan, dtype=float)
+    b = np.full_like(emf, np.nan, dtype=float)
 
     match name:
         case 'CH4':
@@ -112,8 +110,8 @@ def correction_time(t):
 
 def calculate_correction(t):
     temp_corr_a, temp_corr_b = interpolate_from_table(28, temp_data)
-    a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3 # 499.0689: CO2_a
-    b_corr = (temp_corr_b + -0.0733 + -0.0722) / 3 # -0.0722: CO2_b
+    a_corr = (temp_corr_a + 538.2376 + 499.0689) / 3 
+    b_corr = (temp_corr_b + -0.0733 + -0.0722) / 3 
     return 3500 / inverseyaxb(a_corr, time_curve(correction_time(t)), b_corr)
 
 def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
@@ -144,40 +142,6 @@ def Sensorppm(temp, rh, EMF, gas_name, t_corr, cr_mode):
     
     ppm = inverseyaxb(a_avg, EMF, b_avg) * correction
     return ppm
-
-def calculate_r2(y, y_pred):
-    ss_res = np.sum((y - y_pred) ** 2)
-    ss_tot = np.sum((y - np.mean(y)) ** 2)
-    r2 = 1 - (ss_res / ss_tot)
-    return r2
-
-def fit_time_with_r2(x, y):
-    popt, _ = curve_fit(lambda x, a, b: yaxb(a, x, b), x, y)
-    a, b = popt
-    y_pred = yaxb(a, x, b)
-    r2 = calculate_r2(y, y_pred)
-    return a, b, r2
-
-def fit_daily_sine(t_sec, temps, period=86400.0):
-    w = 2*np.pi/period
-    t_sec = np.array(t_sec, dtype=float)
-    temps = np.array(temps, dtype=float)
-    X = np.column_stack([np.ones_like(t_sec), np.sin(w*t_sec), np.cos(w*t_sec)])
-    coeffs, *_ = np.linalg.lstsq(X, temps, rcond=None)
-    return coeffs[0], coeffs[1], coeffs[2], w
-
-def predict_temp(t, M, C, D, w):
-    return M + C*np.sin(w*t) + D*np.cos(w*t)
-
-def function(constant, mini_slope):
-    return constant * mini_slope + constant
-
-def differentiation(valuea, value, valueb):
-    slope = valuea * valueb * np.power(value, valueb-1)
-    slope = limit(slope, -1, 1)
-    mini_slope = slope / 4
-    return mini_slope
-    # return True if slope >= 0 else False
 
 def create_cube(center, xmin, xmax, ymin, ymax, zmin, zmax):
     x0, y0, z0 = center
@@ -224,11 +188,16 @@ emf_max = gases[selected_gas][3]
 
 time, percentile, temperature, rh = np.array(df["Time"], dtype=float), np.array(df["Per"], dtype=float), np.array(df["Temp"], dtype=float), np.array(df["Rh"], dtype=float)
 percentile, temperature, rh = limit(percentile, 0, 100), limit(temperature, -10, 50), limit(rh, 0, 100)
-M, C, D, w = fit_daily_sine(time, temperature)
+
 SensorValue = percentile / 100
 correction_coefficient = np.array([calculate_correction(t) for t in time])
 corrected_time = time if min(time)==1 else (time - min(time)) / 20 + 1
-temp_time = np.array([predict_temp(t, M, C, D, w) for t in time])
+
+time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time) - min(time)) * 2 + min(time) + 20, 200)
+corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
+
+M, C, D, w = fit_daily_sine(corrected_time, temperature)
+temp_time = np.array([predict_temp(t, M, C, D, w) for t in corrected_time])
 r2_temp_time = calculate_r2(temperature, temp_time)
 
 a_rh_time, b_rh_time, r2_rh_time = fit_time_with_r2(corrected_time, rh)
@@ -237,12 +206,16 @@ a_percentile_time, b_percentile_time, r2_percentile_time = fit_time_with_r2(corr
 a_rh_time, b_rh_time, r2_rh_time, r2_temp_time = roundf(a_rh_time, b_rh_time, r2_rh_time, r2_temp_time)
 a_percentile_time, b_percentile_time, r2_percentile_time = roundf(a_percentile_time, b_percentile_time, r2_percentile_time)
 
-time_surface = vals(min(time), max(time)*2 if min(time)==1 else (max(time) - min(time)) * 2 + min(time) + 20, 200)
-corrected_time_surface = time_surface if min(time)==1 else (time_surface - min(time)) / 20 + 1
-temperature_surface = limit(np.array([predict_temp(t, M, C, D, w) for t in time_surface]), -10, 50)
-rh_surface = limit(yaxb(a_rh_time, corrected_time_surface, b_rh_time), 0, 100)
+r2_temp_time_best, temperature_surface_raw, model_temp = EstimateData.get_best_fit(corrected_time, temperature, corrected_time_surface)
+temperature_surface = limit(temperature_surface_raw, -10, 50)
+
+r2_rh_time_best, rh_surface_raw, model_rh = EstimateData.get_best_fit(corrected_time, rh, corrected_time_surface, temp=temperature, temp_surface=temperature_surface)
+rh_surface = limit(rh_surface_raw, 0, 100)
+
+r2_percentile_time_best, percentile_surface_raw, model_per = EstimateData.get_best_fit(corrected_time, percentile, corrected_time_surface, temp=temperature, temp_surface=temperature_surface)
+percentile_surface = limit(percentile_surface_raw, 0, 100)
+
 correction_coefficient_surface = np.array([calculate_correction(t) for t in time_surface])
-percentile_surface = limit(yaxb(a_percentile_time, corrected_time_surface, b_percentile_time), 0, 100)
 SensorValue_surface = percentile_surface / 100
 
 mintime = np.min(time_surface)
@@ -407,16 +380,12 @@ fig.add_trace(go.Scatter3d(
     customdata=np.stack((time_surface, temperature_surface, rh_surface, correction_coefficient_surface), axis=-1)
 ))
 
-cam1 = 1.75
-cam2 = function(1.09375, differentiation(a_rh_time, maxtime, b_rh_time))
-cam3 = function(0.088, differentiation(a_percentile_time, maxtime, b_percentile_time))
-
 fig.update_layout(
     scene=dict(
-        camera=dict(eye=dict(x=cam1, y=cam2, z=cam3)),
-        xaxis_title=f"X: Temp (°C) R² = {r2_temp_time}",
-        yaxis_title=f"Y: RH (%) R² = {r2_rh_time}",
-        zaxis_title=f"Z: {selected_gas} (ppm) R² = {r2_percentile_time}",
+        camera=dict(eye=dict(x=1.75, y=1.09375, z=0.088)),
+        xaxis_title=f"X: Temp (°C) R² = {r2_temp_time_best}",
+        yaxis_title=f"Y: RH (%) R² = {r2_rh_time_best}",
+        zaxis_title=f"Z: {selected_gas} (ppm) R² = {r2_percentile_time_best}",
         xaxis=dict(range=[xmin, xmax], nticks=10, showbackground=False),
         yaxis=dict(range=[ymin, ymax], nticks=10, showbackground=False),
         zaxis=dict(range=[zmin, zmax], nticks=10, showbackground=False),
@@ -436,10 +405,10 @@ fig.add_annotation(text=f"MG811 {selected_gas} Time-based PPM Calculation", x=0.
 
 fig.write_html(f"MG811_{selected_gas}_4D_Slope_Estimation.html")
 
-print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}")
+print(f"Gas: {selected_gas} | R²_Per={r2_percentile_time_best} | R²_Temp={r2_temp_time_best} | R²_Rh={r2_rh_time_best}")
 with open("DataReport.txt", "a") as f:
     f.write("\n")
-    f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
+    f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time_best} | R²_Temp={r2_temp_time_best} | R²_Rh={r2_rh_time_best}\n")
 
 for t_val, temp_val, rh_val, sv_val, corr_val in zip(time, temperature, rh, SensorValue, correction_coefficient):
     EMF_val = interpolate(sv_val, 0, 1, emf_max, emf_min)
@@ -451,7 +420,7 @@ print("")
 
 with open("EstimationReport.txt", "a") as f:
     f.write("\n")
-    f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time} | R²_Temp={r2_temp_time} | R²_Rh={r2_rh_time}\n")
+    f.write(f"Gas: {selected_gas} | R²_Per={r2_percentile_time_best} | R²_Temp={r2_temp_time_best} | R²_Rh={r2_rh_time_best}\n")
 
 for t_val, temp_val, rh_val, sv_val, corr_val in zip(time_surface, temperature_surface, rh_surface, SensorValue_surface, correction_coefficient_surface):
     EMF_val = interpolate(sv_val, 0, 1, emf_max, emf_min)
